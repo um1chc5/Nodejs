@@ -1,3 +1,3 @@
-import { run } from './services/database.services'
+import databaseService from './services/database.services'
 
-run().catch(console.dir)
+databaseService.connect()
