@@ -19,10 +19,9 @@ export const registerController = async (
   req: Request<ParamsDictionary, unknown, RegisterRequestBody>,
   res: Response
 ) => {
-  console.log(req.body)
+  console.log('req body', req.body)
   try {
     const result = await usersService.register(req.body)
-    console.log(result)
     return res.status(200).json({
       message: 'Login Successfully',
       result
