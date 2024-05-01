@@ -51,7 +51,6 @@ class UsersServices {
 
   async checkEmailExist(email: string) {
     const user = await databaseService.users.findOne({ email })
-    console.log(user)
     return Boolean(user)
   }
 }
