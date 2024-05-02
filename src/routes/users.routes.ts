@@ -1,9 +1,11 @@
 import { Router } from 'express'
-import { registerController } from '~/controllers/users.controllers'
-import { registerValidator } from '~/middlewares/users.middlewares'
+import { loginController, registerController } from '~/controllers/users.controllers'
+import { loginValidator, registerValidator } from '~/middlewares/users.middlewares'
 import { asyncWrapper } from '~/utils/asyncWrapper'
 
 const userRouter = Router()
+
+userRouter.post('/login', loginValidator, asyncWrapper(loginController))
 
 userRouter.post('/register', registerValidator, asyncWrapper(registerController))
 

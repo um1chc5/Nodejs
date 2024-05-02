@@ -1,9 +1,10 @@
-import { User } from '~/models/schemas/User.schema'
+import { IUser, User } from '~/models/schemas/User.schema'
 import databaseService from './database.services'
 import { RegisterRequestBody } from '~/models/requests/user.requests'
 import { hashPassword } from '~/utils/encrypt'
 import { signToken } from '~/utils/jwt'
 import { TokenTypes } from '~/constants/enum'
+import { WithId } from 'mongodb'
 
 class UsersServices {
   private signAccessToken(userId: string) {
@@ -29,6 +30,20 @@ class UsersServices {
     })
   }
 
+  private generateTokens(userId: string) {
+    return Promise.all([this.signAccessToken(userId), this.signRefreshToken(userId)])
+  }
+
+  async login(payload: WithId<IUser>) {
+    const { _id, verify } = payload
+    const [access_token, refresh_token] = await this.generateTokens(_id.toString())
+
+    return {
+      access_token,
+      refresh_token
+    }
+  }
+
   async register(payload: RegisterRequestBody) {
     const result = await databaseService.users.insertOne(
       new User({
@@ -39,10 +54,7 @@ class UsersServices {
     )
 
     const userId = result.insertedId.toString()
-    const [access_token, refresh_token] = await Promise.all([
-      this.signAccessToken(userId),
-      this.signRefreshToken(userId)
-    ])
+    const [access_token, refresh_token] = await this.generateTokens(userId)
     return {
       access_token,
       refresh_token
