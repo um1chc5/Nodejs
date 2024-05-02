@@ -4,7 +4,11 @@ import { RegisterRequestBody } from '~/models/requests/user.requests'
 import { hashPassword } from '~/utils/encrypt'
 import { signToken } from '~/utils/jwt'
 import { TokenTypes } from '~/constants/enum'
-import { WithId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
+import { RefreshToken } from '~/models/schemas/Tokens.schema'
+import { config } from 'dotenv'
+
+config()
 
 class UsersServices {
   private signAccessToken(userId: string) {
@@ -35,8 +39,12 @@ class UsersServices {
   }
 
   async login(payload: WithId<IUser>) {
-    const { _id, verify } = payload
-    const [access_token, refresh_token] = await this.generateTokens(_id.toString())
+    const { _id: user_id, verify } = payload
+    const [access_token, refresh_token] = await this.generateTokens(user_id.toString())
+
+    await databaseService.refreshToken.insertOne(
+      new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
+    )
 
     return {
       access_token,
@@ -53,8 +61,13 @@ class UsersServices {
       })
     )
 
-    const userId = result.insertedId.toString()
-    const [access_token, refresh_token] = await this.generateTokens(userId)
+    const user_id = result.insertedId.toString()
+    const [access_token, refresh_token] = await this.generateTokens(user_id)
+
+    await databaseService.refreshToken.insertOne(
+      new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
+    )
+
     return {
       access_token,
       refresh_token

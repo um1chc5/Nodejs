@@ -1,4 +1,7 @@
+import { config } from 'dotenv'
 import { sign, SignOptions } from 'jsonwebtoken'
+
+config()
 
 interface SignTokenParams {
   payload: string | Buffer | object

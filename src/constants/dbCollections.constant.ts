@@ -1,3 +1,4 @@
 export const dbCollections = {
-  users: 'users'
+  users: 'users',
+  refresh_token: 'refresh_token'
 } as const
