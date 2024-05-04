@@ -22,14 +22,14 @@ const validate = (validation: RunnableValidationChains<ValidationChain>) => {
     for (const key in errorsObject) {
       const error = errorsObject[key]
       const { msg } = error
-      console.log(errorsObject)
+      // console.log(errorsObject)
       if (msg instanceof ErrorWithStatus && msg.status !== HttpStatusCode.UNPROCESSABLE_ENTITY) {
         return next(msg)
       }
       entityError.errors[key] = error
     }
 
-    console.log(entityError)
+    // console.log(entityError)
 
     next(entityError)
   }

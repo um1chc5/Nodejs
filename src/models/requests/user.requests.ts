@@ -4,3 +4,7 @@ export interface RegisterRequestBody {
   password: string
   date_of_birth: string
 }
+
+export interface LogoutRequestBody {
+  refresh_token: string
+}

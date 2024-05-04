@@ -78,6 +78,11 @@ class UsersServices {
     const user = await databaseService.users.findOne({ email })
     return Boolean(user)
   }
+
+  async logout(refresh_token: string) {
+    const result = await databaseService.refreshToken.deleteOne({ token: refresh_token })
+    return result
+  }
 }
 
 const usersService = new UsersServices()
