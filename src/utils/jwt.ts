@@ -5,15 +5,11 @@ config()
 
 interface SignTokenParams {
   payload: string | Buffer | object
-  privateKey?: string
+  privateKey: string
   options?: SignOptions
 }
 
-export const signToken = ({
-  payload,
-  privateKey = process.env.JWT_SECRET as string,
-  options = { algorithm: 'HS256' }
-}: SignTokenParams) => {
+export const signToken = ({ payload, privateKey, options = { algorithm: 'HS256' } }: SignTokenParams) => {
   return new Promise<string>((resolve, reject) =>
     sign(payload, privateKey, options, (error, token) => {
       if (error) reject(error)
@@ -24,10 +20,10 @@ export const signToken = ({
 
 interface VerifyTokenParams {
   token: string
-  secretOrPublicKey?: string
+  secretOrPublicKey: string
 }
 
-export const verifyToken = ({ token, secretOrPublicKey = process.env.JWT_SECRET as string }: VerifyTokenParams) => {
+export const verifyToken = ({ token, secretOrPublicKey }: VerifyTokenParams) => {
   return new Promise<JwtPayload>((resolve, reject) =>
     verify(token, secretOrPublicKey, (error, decoded) => {
       if (error) reject(error)
