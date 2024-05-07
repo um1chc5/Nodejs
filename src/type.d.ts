@@ -6,6 +6,7 @@ declare module 'express' {
   interface Request {
     user?: WithId<IUser>
     decode_email_verify_token?: TokenPayload
+    decode_authorization?: TokenPayload
   }
 }
 

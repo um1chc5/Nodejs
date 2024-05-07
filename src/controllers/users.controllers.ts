@@ -5,6 +5,7 @@ import { LogoutRequestBody, RegisterRequestBody } from './../models/requests/use
 import { USER_MESSAGES } from '~/constants/messages'
 import databaseService from '~/services/database.services'
 import { ObjectId } from 'mongodb'
+import { UserVerifyStatus } from '~/constants/enum'
 
 export const loginController = async (req: Request, res: Response) => {
   const user = req.user
@@ -61,5 +62,27 @@ export const verifyEmailController = async (
   return res.status(200).json({
     message: USER_MESSAGES.EMAIL_VERIFY_SUCCESSFULLY,
     result
+  })
+}
+
+export const resendVerifyEmailController = async (req: Request, res: Response) => {
+  const user_id = req.decode_authorization?.user_id
+  const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+  if (!user) {
+    return res.status(404).json({
+      message: USER_MESSAGES.USER_NOT_FOUND
+    })
+  }
+
+  if (user.verify === UserVerifyStatus.Verified) {
+    return res.status(200).json({
+      message: USER_MESSAGES.EMAIL_VERIFIED
+    })
+  }
+
+  await usersService.resendVerifyEmailController(user_id ?? '')
+
+  return res.status(200).json({
+    message: USER_MESSAGES.RESEND_VERIFY_EMAIL_SUCCESSFULLY
   })
 }

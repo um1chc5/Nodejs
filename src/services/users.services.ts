@@ -53,6 +53,20 @@ class UsersServices {
     return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
   }
 
+  private async deleteRefreshToken({ user_id, refresh_token }: { user_id?: string; refresh_token?: string }) {
+    if (user_id) {
+      await databaseService.refreshToken.deleteOne({ user_id: new ObjectId(user_id) })
+    }
+
+    if (refresh_token) {
+      await databaseService.refreshToken.deleteOne({ token: refresh_token })
+    }
+  }
+
+  private async insertNewRefreshToken(user_id: string, token: string) {
+    databaseService.refreshToken.insertOne(new RefreshToken({ user_id: new ObjectId(user_id), token: token }))
+  }
+
   async login(payload: WithId<IUser>) {
     const { _id: user_id, verify } = payload
     const [access_token, refresh_token] = await this.generateTokens(user_id.toString())
@@ -99,7 +113,7 @@ class UsersServices {
   }
 
   async logout(refresh_token: string) {
-    const result = await databaseService.refreshToken.deleteOne({ token: refresh_token })
+    const result = this.deleteRefreshToken({ refresh_token: refresh_token })
     return result
   }
 
@@ -120,10 +134,30 @@ class UsersServices {
         }
       )
     ])
+
+    await Promise.all([this.deleteRefreshToken({ user_id: user_id }), this.insertNewRefreshToken(user_id, tokens[1])])
+
     return {
       access_token: tokens[0],
       refresh_token: tokens[1]
     }
+  }
+
+  async resendVerifyEmailController(user_id: string) {
+    const email_verify_token = await this.signEmailVerifyToken(user_id)
+    const result = await databaseService.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          email_verify_token: email_verify_token
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+
+    return true
   }
 }
 

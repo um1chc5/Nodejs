@@ -14,5 +14,6 @@ export const USER_MESSAGES = {
   EMAIL_VERIFY_TOKEN_EXPIRED: 'Email verify token is expired',
   EMAIL_VERIFY_TOKEN_UNAVAILABLE: 'Email verify token is unavailable or duplicated',
   USER_NOT_FOUND: 'User not found',
-  EMAIL_VERIFIED: 'Email verified'
+  EMAIL_VERIFIED: 'Email verified',
+  RESEND_VERIFY_EMAIL_SUCCESSFULLY: 'Resend verify email successfully'
 } as const

@@ -221,7 +221,7 @@ export const verifyEmailTokenValidator = validate(
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
-                  message: USER_MESSAGES.REFRESH_TOKEN_INVALID,
+                  message: USER_MESSAGES.EMAIL_VERIFY_TOKEN_INVALID,
                   status: HttpStatusCode.UNAUTHORIZED
                 })
               }
