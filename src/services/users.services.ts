@@ -43,9 +43,22 @@ class UsersServices {
         tokenType: TokenTypes.EmailVerifyToken
       },
       options: {
+        expiresIn: process.env.FORGOT_PASSWORD_TOKEN_EXPIRE
+      },
+      privateKey: process.env.JWT_FORGOT_PASSWORD_TOKEN
+    })
+  }
+
+  private async signForgotPasswordToken(user_id: string) {
+    return signToken({
+      payload: {
+        user_id,
+        tokenType: TokenTypes.ForgotPasswordToken
+      },
+      options: {
         expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPIRE
       },
-      privateKey: process.env.JWT_EMAIL_VERIFY_TOKEN
+      privateKey: process.env.JWT_FORGOT_PASSWORD_TOKEN
     })
   }
 
@@ -143,7 +156,7 @@ class UsersServices {
     }
   }
 
-  async resendVerifyEmailController(user_id: string) {
+  async resendVerifyEmail(user_id: string) {
     const email_verify_token = await this.signEmailVerifyToken(user_id)
     const result = await databaseService.users.updateOne(
       { _id: new ObjectId(user_id) },
@@ -157,7 +170,39 @@ class UsersServices {
       }
     )
 
-    return true
+    return result
+  }
+
+  async createForgotPasswordToken(user_id: string) {
+    const token = await this.signForgotPasswordToken(user_id)
+    await databaseService.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          forgot_password_token: token
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+
+    return token
+  }
+
+  async verifyForgotPassword(user_id: string) {
+    const result = await databaseService.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          forgot_password_token: ''
+        },
+        $currentDate: {
+          updated_at: true
+        }
+      }
+    )
+    return result
   }
 }
 

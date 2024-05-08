@@ -17,3 +17,11 @@ export interface TokenPayload extends JwtPayload {
   token_type: TokenTypes
   verify: UserVerifyStatus
 }
+
+export interface ForgotPasswordReqBody {
+  email: string
+}
+
+export interface VerifyForgotPasswordReqBody {
+  forgot_password_token: string
+}

@@ -7,6 +7,7 @@ declare module 'express' {
     user?: WithId<IUser>
     decode_email_verify_token?: TokenPayload
     decode_authorization?: TokenPayload
+    decode_forgot_password_token?: TokenPayload
   }
 }
 
@@ -20,9 +21,11 @@ declare global {
       JWT_SECRET_ACCESS_TOKEN: string
       JWT_SECRET_REFRESH_TOKEN: string
       JWT_EMAIL_VERIFY_TOKEN: string
+      JWT_FORGOT_PASSWORD_TOKEN: string
       ACCESS_TOKEN_EXPIRE: string
       REFRESH_TOKEN_EXPIRE: string
       EMAIL_VERIFY_TOKEN_EXPIRE: string
+      FORGOT_PASSWORD_TOKEN_EXPIRE: string
     }
   }
 }

@@ -1,5 +1,6 @@
 import { config } from 'dotenv'
-import { JwtPayload, sign, SignOptions, verify, VerifyOptions } from 'jsonwebtoken'
+import { sign, SignOptions, verify, VerifyOptions } from 'jsonwebtoken'
+import { TokenPayload } from '~/models/requests/user.requests'
 
 config()
 
@@ -24,10 +25,10 @@ interface VerifyTokenParams {
 }
 
 export const verifyToken = ({ token, secretOrPublicKey }: VerifyTokenParams) => {
-  return new Promise<JwtPayload>((resolve, reject) =>
+  return new Promise<TokenPayload>((resolve, reject) =>
     verify(token, secretOrPublicKey, (error, decoded) => {
       if (error) reject(error)
-      if (decoded) resolve(decoded as JwtPayload)
+      if (decoded) resolve(decoded as TokenPayload)
     })
   )
 }
