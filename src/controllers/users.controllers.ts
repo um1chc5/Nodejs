@@ -12,6 +12,7 @@ import { USER_MESSAGES } from '~/constants/messages'
 import databaseService from '~/services/database.services'
 import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
+import { omit } from 'lodash'
 
 export const loginController = async (req: Request, res: Response) => {
   const user = req.user
@@ -121,5 +122,14 @@ export const resetPasswordController = async (
   await usersService.resetPassword(user_id, password)
   return res.status(200).json({
     message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESSFULLY
+  })
+}
+
+export const getProfileController = async (req: Request, res: Response) => {
+  const user_id = req.decode_authorization?.user_id
+  const user = await usersService.getUserById(user_id ?? '')
+  return res.status(200).json({
+    message: USER_MESSAGES.GET_PROFILE_SUCCESSFULLY,
+    result: user
   })
 }
