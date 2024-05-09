@@ -5,6 +5,7 @@ import {
   ForgotPasswordReqBody,
   LogoutRequestBody,
   RegisterRequestBody,
+  ResetPasswordRequestBody,
   VerifyForgotPasswordReqBody
 } from './../models/requests/user.requests'
 import { USER_MESSAGES } from '~/constants/messages'
@@ -108,5 +109,17 @@ export const verifyForgotPasswordTokenController = async (
 ) => {
   return res.status(200).json({
     message: USER_MESSAGES.VERIFY_FORGOT_PASSWORD_SUCCESSFULLY
+  })
+}
+
+export const resetPasswordController = async (
+  req: Request<ParamsDictionary, unknown, ResetPasswordRequestBody>,
+  res: Response
+) => {
+  const { password } = req.body
+  const user_id = req.user?._id.toString() ?? ''
+  await usersService.resetPassword(user_id, password)
+  return res.status(200).json({
+    message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESSFULLY
   })
 }
