@@ -11,11 +11,12 @@ import { config } from 'dotenv'
 config()
 
 class UsersServices {
-  private signAccessToken(user_id: string) {
+  private signAccessToken(user_id: string, verify?: UserVerifyStatus) {
     return signToken({
       payload: {
         user_id,
-        tokenType: TokenTypes.AccessToken
+        tokenType: TokenTypes.AccessToken,
+        verify: verify
       },
       options: {
         expiresIn: process.env.ACCESS_TOKEN_EXPIRE
@@ -23,11 +24,12 @@ class UsersServices {
       privateKey: process.env.JWT_SECRET_ACCESS_TOKEN
     })
   }
-  private signRefreshToken(user_id: string) {
+  private signRefreshToken(user_id: string, verify?: UserVerifyStatus) {
     return signToken({
       payload: {
         user_id,
-        tokenType: TokenTypes.RefreshToken
+        tokenType: TokenTypes.RefreshToken,
+        verify: verify
       },
       options: {
         expiresIn: process.env.REFRESH_TOKEN_EXPIRE
@@ -43,9 +45,9 @@ class UsersServices {
         tokenType: TokenTypes.EmailVerifyToken
       },
       options: {
-        expiresIn: process.env.FORGOT_PASSWORD_TOKEN_EXPIRE
+        expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPIRE
       },
-      privateKey: process.env.JWT_FORGOT_PASSWORD_TOKEN
+      privateKey: process.env.JWT_EMAIL_VERIFY_TOKEN
     })
   }
 
@@ -62,8 +64,8 @@ class UsersServices {
     })
   }
 
-  private generateTokens(user_id: string) {
-    return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
+  private generateTokens(user_id: string, verify?: UserVerifyStatus) {
+    return Promise.all([this.signAccessToken(user_id, verify), this.signRefreshToken(user_id, verify)])
   }
 
   private async deleteRefreshToken({ user_id, refresh_token }: { user_id?: string; refresh_token?: string }) {
@@ -82,7 +84,7 @@ class UsersServices {
 
   async login(payload: WithId<IUser>) {
     const { _id: user_id, verify } = payload
-    const [access_token, refresh_token] = await this.generateTokens(user_id.toString())
+    const [access_token, refresh_token] = await this.generateTokens(user_id.toString(), verify)
 
     await databaseService.refreshToken.insertOne(
       new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token })
@@ -132,14 +134,13 @@ class UsersServices {
 
   async verifyEmail(user_id: string) {
     const [tokens] = await Promise.all([
-      this.generateTokens(user_id),
+      this.generateTokens(user_id, UserVerifyStatus.Verified),
       databaseService.users.updateOne(
         { _id: new ObjectId(user_id) },
         {
           $set: {
             email_verify_token: '',
             verify: UserVerifyStatus.Verified
-            // updated_at: new Date()
           },
           $currentDate: {
             updated_at: true

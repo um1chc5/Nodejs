@@ -1,6 +1,8 @@
+import { Request, Response } from 'express'
 import { checkSchema, ParamSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
+import { UserVerifyStatus } from '~/constants/enum'
 import HttpStatusCode from '~/constants/HttpStatusCode.enum'
 import { USER_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/errors.model'
@@ -286,7 +288,7 @@ export const verifyEmailTokenValidator = validate(
             } catch (error) {
               if (error instanceof JsonWebTokenError) {
                 throw new ErrorWithStatus({
-                  message: USER_MESSAGES.EMAIL_VERIFY_TOKEN_INVALID,
+                  message: error.message,
                   status: HttpStatusCode.UNAUTHORIZED
                 })
               }
@@ -348,6 +350,17 @@ export const resetPasswordValidator = validate(
     forgot_password_token: forgotPasswordTokenSchema
   })
 )
+
+export const verifiedUserValidator = (req: Request, res: Response) => {
+  const verify = req.decode_authorization?.verify
+  if (verify !== UserVerifyStatus.Verified) {
+    throw new ErrorWithStatus({
+      message: USER_MESSAGES.USER_NOT_VERIFIED,
+      status: HttpStatusCode.FORBIDDEN
+    })
+  }
+  return true
+}
 
 const checkRequiredRefreshToken = (value: string) => {
   if (!value) {

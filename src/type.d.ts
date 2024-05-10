@@ -1,6 +1,6 @@
 import { WithId } from 'mongodb'
 import { IUser } from './models/schemas/User.schema'
-import { TokenPayload } from './models/requests/user.requests'
+import { TokenPayload } from './models/schemas/Tokens.schema'
 
 declare module 'express' {
   interface Request {

@@ -1,6 +1,6 @@
 import { config } from 'dotenv'
 import { sign, SignOptions, verify, VerifyOptions } from 'jsonwebtoken'
-import { TokenPayload } from '~/models/requests/user.requests'
+import { TokenPayload } from '~/models/schemas/Tokens.schema'
 
 config()
 

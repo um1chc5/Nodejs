@@ -1,4 +1,6 @@
+import { JwtPayload } from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
+import { TokenTypes, UserVerifyStatus } from '~/constants/enum'
 
 interface IRefreshToken {
   _id?: ObjectId
@@ -18,4 +20,10 @@ export class RefreshToken {
     this.token = token
     this.user_id = user_id
   }
+}
+
+export interface TokenPayload extends JwtPayload {
+  user_id: string
+  token_type: TokenTypes
+  verify: UserVerifyStatus
 }
