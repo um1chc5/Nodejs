@@ -237,6 +237,16 @@ class UsersServices {
     )
     return user
   }
+  async updateProfile(user_id: string, body: IUser) {
+    console.log(body)
+    const result = await databaseService.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: body
+      }
+    )
+    return result
+  }
 }
 
 const usersService = new UsersServices()

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { checkSchema, ParamSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
@@ -351,7 +351,7 @@ export const resetPasswordValidator = validate(
   })
 )
 
-export const verifiedUserValidator = (req: Request, res: Response) => {
+export const verifiedUserValidator = (req: Request, res: Response, next: NextFunction) => {
   const verify = req.decode_authorization?.verify
   if (verify !== UserVerifyStatus.Verified) {
     throw new ErrorWithStatus({
@@ -359,8 +359,41 @@ export const verifiedUserValidator = (req: Request, res: Response) => {
       status: HttpStatusCode.FORBIDDEN
     })
   }
-  return true
+  next()
 }
+
+export const updateProfileValidator = validate(
+  checkSchema(
+    {
+      name: {
+        trim: true
+      },
+      date_of_birth: {
+        optional: true,
+        isISO8601: true
+      },
+      bio: {
+        trim: true
+      },
+      location: {
+        trim: true
+      },
+      website: {
+        trim: true
+      },
+      username: {
+        trim: true
+      },
+      avatar: {
+        trim: true
+      },
+      cover_photo: {
+        trim: true
+      }
+    },
+    ['body']
+  )
+)
 
 const checkRequiredRefreshToken = (value: string) => {
   if (!value) {

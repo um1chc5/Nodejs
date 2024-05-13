@@ -13,6 +13,7 @@ import databaseService from '~/services/database.services'
 import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
 import { omit } from 'lodash'
+import { IUser } from '~/models/schemas/User.schema'
 
 export const loginController = async (req: Request, res: Response) => {
   const user = req.user
@@ -131,5 +132,21 @@ export const getProfileController = async (req: Request, res: Response) => {
   return res.status(200).json({
     message: USER_MESSAGES.GET_PROFILE_SUCCESSFULLY,
     result: user
+  })
+}
+
+export const updateProfileController = async (req: Request<ParamsDictionary, unknown, IUser>, res: Response) => {
+  const user_id = req.decode_authorization?.user_id ?? ''
+  const user = await usersService.getUserById(user_id ?? '')
+  if (!user) {
+    return res.status(404).json({
+      message: USER_MESSAGES.USER_NOT_FOUND
+    })
+  }
+
+  const result = await usersService.updateProfile(user_id, req.body)
+  return res.status(200).json({
+    message: USER_MESSAGES.UPDATE_PROFILE_SUCCESSFULLY,
+    result
   })
 }

@@ -25,5 +25,6 @@ export const USER_MESSAGES = {
   VERIFY_FORGOT_PASSWORD_SUCCESSFULLY: 'Verify forgot password token successfully',
   PASSWORD_NOT_MATCH: 'Passwords do not match',
   GET_PROFILE_SUCCESSFULLY: 'Get profile successfully',
-  USER_NOT_VERIFIED: 'User is not verified'
+  USER_NOT_VERIFIED: 'User is not verified',
+  UPDATE_PROFILE_SUCCESSFULLY: 'Update profile successfully'
 } as const
