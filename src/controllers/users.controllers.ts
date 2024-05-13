@@ -126,7 +126,7 @@ export const resetPasswordController = async (
   })
 }
 
-export const getProfileController = async (req: Request, res: Response) => {
+export const getMeController = async (req: Request, res: Response) => {
   const user_id = req.decode_authorization?.user_id
   const user = await usersService.getUserById(user_id ?? '')
   return res.status(200).json({
@@ -148,5 +148,19 @@ export const updateProfileController = async (req: Request<ParamsDictionary, unk
   return res.status(200).json({
     message: USER_MESSAGES.UPDATE_PROFILE_SUCCESSFULLY,
     result
+  })
+}
+
+export const getProfileController = async (req: Request<{ username: string }>, res: Response) => {
+  const { username } = req.params
+  const user = await usersService.getUserByUsername(username)
+  if (!user) {
+    return res.status(404).json({
+      message: USER_MESSAGES.USER_NOT_FOUND
+    })
+  }
+  return res.status(200).json({
+    message: USER_MESSAGES.GET_PROFILE_SUCCESSFULLY,
+    result: user
   })
 }

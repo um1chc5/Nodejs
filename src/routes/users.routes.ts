@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   forgotPasswordController,
+  getMeController,
   getProfileController,
   loginController,
   logoutController,
@@ -47,7 +48,7 @@ userRouter.post(
 
 userRouter.post('/reset-password', resetPasswordValidator, asyncWrapper(resetPasswordController))
 
-userRouter.get('/me', accessTokenValidator, asyncWrapper(getProfileController))
+userRouter.get('/me', accessTokenValidator, asyncWrapper(getMeController))
 
 userRouter.patch(
   '/update-me',
@@ -56,5 +57,7 @@ userRouter.patch(
   asyncWrapper(verifiedUserValidator),
   asyncWrapper(updateProfileController)
 )
+
+userRouter.get('/get-profile/:username', accessTokenValidator, asyncWrapper(getProfileController))
 
 export default userRouter

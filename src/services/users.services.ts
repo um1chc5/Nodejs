@@ -247,6 +247,25 @@ class UsersServices {
     )
     return result
   }
+
+  async getUserByUsername(username: string) {
+    const result = await databaseService.users.findOne(
+      {
+        username: username
+      },
+      {
+        projection: {
+          password: 0,
+          email_verify_token: 0,
+          forgot_password_token: 0,
+          created_at: 0,
+          updated_at: 0,
+          _id: 0
+        }
+      }
+    )
+    return result
+  }
 }
 
 const usersService = new UsersServices()
