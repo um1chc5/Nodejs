@@ -164,3 +164,15 @@ export const getProfileController = async (req: Request<{ username: string }>, r
     result: user
   })
 }
+
+export const addFollowController = async (
+  req: Request<ParamsDictionary, unknown, { followed_user_id: string }>,
+  res: Response
+) => {
+  const { followed_user_id } = req.body
+  const user_id = req.decode_authorization?.user_id ?? ''
+  await usersService.addFollow(user_id, followed_user_id)
+  return res.status(200).json({
+    message: USER_MESSAGES.ADD_FOLLOW_SUCCESSFULLY
+  })
+}

@@ -395,6 +395,32 @@ export const updateProfileValidator = validate(
   )
 )
 
+export const addFollowValidator = validate(
+  checkSchema({
+    followed_user_id: {
+      notEmpty: {
+        errorMessage: USER_MESSAGES.REQUIRED_USERNAME
+      },
+      isMongoId: {
+        errorMessage: USER_MESSAGES.INVALID_USER_ID
+      },
+      custom: {
+        options: async (value) => {
+          const followed_user = await databaseService.users.findOne({ _id: new ObjectId(value as string) })
+
+          if (followed_user === null) {
+            throw new ErrorWithStatus({
+              message: USER_MESSAGES.USER_NOT_FOUND,
+              status: HttpStatusCode.NOT_FOUND
+            })
+          }
+          return true
+        }
+      }
+    }
+  })
+)
+
 const checkRequiredRefreshToken = (value: string) => {
   if (!value) {
     throw new ErrorWithStatus({

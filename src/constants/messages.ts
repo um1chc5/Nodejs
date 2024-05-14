@@ -5,6 +5,9 @@ export const USER_MESSAGES = {
   REQUIRED_EMAIL_VERIFY_TOKEN: 'Email verify token is required',
   REQUIRED_FORGOT_PASSWORD_TOKEN: 'Forgot password token is required',
   REQUIRED_NEW_PASSWORD: 'New password is required',
+  REQUIRED_USERNAME: 'Username is required',
+  REQUIRED_USER_ID: 'Username is required',
+  INVALID_USER_ID: 'Username is invalid',
   CHANGE_PASSWORD_SUCCESSFULLY: 'Change password successfully',
   REFRESH_TOKEN_INVALID: 'Refresh token is invalid',
   REFRESH_TOKEN_UNAVAILABLE: 'Refresh token is unavailable or duplicated',
@@ -26,5 +29,6 @@ export const USER_MESSAGES = {
   PASSWORD_NOT_MATCH: 'Passwords do not match',
   GET_PROFILE_SUCCESSFULLY: 'Get profile successfully',
   USER_NOT_VERIFIED: 'User is not verified',
-  UPDATE_PROFILE_SUCCESSFULLY: 'Update profile successfully'
+  UPDATE_PROFILE_SUCCESSFULLY: 'Update profile successfully',
+  ADD_FOLLOW_SUCCESSFULLY: 'Add follow to profile successfully'
 } as const

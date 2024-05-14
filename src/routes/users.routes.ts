@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import {
+  addFollowController,
   forgotPasswordController,
   getMeController,
   getProfileController,
@@ -14,6 +15,7 @@ import {
 } from '~/controllers/users.controllers'
 import {
   accessTokenValidator,
+  addFollowValidator,
   forgotPasswordTokenValidator,
   forgotPasswordValidator,
   loginValidator,
@@ -53,11 +55,19 @@ userRouter.get('/me', accessTokenValidator, asyncWrapper(getMeController))
 userRouter.patch(
   '/update-me',
   accessTokenValidator,
-  updateProfileValidator,
   asyncWrapper(verifiedUserValidator),
+  updateProfileValidator,
   asyncWrapper(updateProfileController)
 )
 
 userRouter.get('/get-profile/:username', accessTokenValidator, asyncWrapper(getProfileController))
+
+userRouter.post(
+  '/follow/add',
+  accessTokenValidator,
+  asyncWrapper(verifiedUserValidator),
+  addFollowValidator,
+  asyncWrapper(addFollowController)
+)
 
 export default userRouter

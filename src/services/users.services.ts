@@ -7,6 +7,7 @@ import { TokenTypes, UserVerifyStatus } from '~/constants/enum'
 import { ObjectId, WithId } from 'mongodb'
 import { RefreshToken } from '~/models/schemas/Tokens.schema'
 import { config } from 'dotenv'
+import { Follower } from '~/models/schemas/Follower.schema'
 
 config()
 
@@ -263,6 +264,16 @@ class UsersServices {
           _id: 0
         }
       }
+    )
+    return result
+  }
+
+  async addFollow(user_id: string, followed_user_id: string) {
+    const result = await databaseService.followers.insertOne(
+      new Follower({
+        user_id: new ObjectId(user_id),
+        followed_user_id: new ObjectId(followed_user_id)
+      })
     )
     return result
   }
