@@ -395,7 +395,7 @@ export const updateProfileValidator = validate(
   )
 )
 
-export const addFollowValidator = validate(
+export const followValidator = validate(
   checkSchema({
     followed_user_id: {
       notEmpty: {

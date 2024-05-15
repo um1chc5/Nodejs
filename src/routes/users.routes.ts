@@ -7,6 +7,7 @@ import {
   loginController,
   logoutController,
   registerController,
+  removeFollowController,
   resendVerifyEmailController,
   resetPasswordController,
   updateProfileController,
@@ -15,7 +16,7 @@ import {
 } from '~/controllers/users.controllers'
 import {
   accessTokenValidator,
-  addFollowValidator,
+  followValidator,
   forgotPasswordTokenValidator,
   forgotPasswordValidator,
   loginValidator,
@@ -66,8 +67,16 @@ userRouter.post(
   '/follow/add',
   accessTokenValidator,
   asyncWrapper(verifiedUserValidator),
-  addFollowValidator,
+  followValidator,
   asyncWrapper(addFollowController)
+)
+
+userRouter.post(
+  '/follow/remove',
+  accessTokenValidator,
+  asyncWrapper(verifiedUserValidator),
+  followValidator,
+  asyncWrapper(removeFollowController)
 )
 
 export default userRouter

@@ -277,6 +277,14 @@ class UsersServices {
     )
     return result
   }
+
+  async removeFollow(user_id: string, followed_user_id: string) {
+    const result = await databaseService.followers.deleteOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+    return result
+  }
 }
 
 const usersService = new UsersServices()

@@ -171,8 +171,44 @@ export const addFollowController = async (
 ) => {
   const { followed_user_id } = req.body
   const user_id = req.decode_authorization?.user_id ?? ''
+
+  const isFollowExisted = await databaseService.followers.findOne({
+    user_id: new ObjectId(user_id),
+    followed_user_id: new ObjectId(followed_user_id)
+  })
+
+  if (isFollowExisted) {
+    return res.status(400).json({
+      message: USER_MESSAGES.FOLLOW_EXISTED
+    })
+  }
+
   await usersService.addFollow(user_id, followed_user_id)
   return res.status(200).json({
     message: USER_MESSAGES.ADD_FOLLOW_SUCCESSFULLY
+  })
+}
+
+export const removeFollowController = async (
+  req: Request<ParamsDictionary, unknown, { followed_user_id: string }>,
+  res: Response
+) => {
+  const { followed_user_id } = req.body
+  const user_id = req.decode_authorization?.user_id ?? ''
+
+  const isFollowExisted = await databaseService.followers.findOne({
+    user_id: new ObjectId(user_id),
+    followed_user_id: new ObjectId(followed_user_id)
+  })
+
+  if (!isFollowExisted) {
+    return res.status(400).json({
+      message: USER_MESSAGES.FOLLOW_NOT_EXISTED
+    })
+  }
+
+  await usersService.removeFollow(user_id, followed_user_id)
+  return res.status(200).json({
+    message: USER_MESSAGES.REMOVE_FOLLOW_SUCCESSFULLY
   })
 }
