@@ -5,6 +5,7 @@ import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
 import HttpStatusCode from '~/constants/HttpStatusCode.enum'
 import { USER_MESSAGES } from '~/constants/messages'
+import { REGEX_USERNAME } from '~/constants/regex'
 import { ErrorWithStatus } from '~/models/errors.model'
 import databaseService from '~/services/database.services'
 import usersService from '~/services/users.services'
@@ -366,29 +367,58 @@ export const updateProfileValidator = validate(
   checkSchema(
     {
       name: {
-        trim: true
+        trim: true,
+        isString: true
       },
       date_of_birth: {
         optional: true,
         isISO8601: true
       },
       bio: {
-        trim: true
+        trim: true,
+        isString: true
       },
       location: {
-        trim: true
+        trim: true,
+        isString: true
       },
       website: {
-        trim: true
+        trim: true,
+        isString: true
       },
       username: {
-        trim: true
+        trim: true,
+        isString: true,
+        custom: {
+          options: async (value) => {
+            const user = await databaseService.users.findOne({
+              username: value
+            })
+
+            if (REGEX_USERNAME.test(value)) {
+              throw new ErrorWithStatus({
+                message: USER_MESSAGES.INVALID_USERNAME,
+                status: HttpStatusCode.BAD_REQUEST
+              })
+            }
+
+            if (user !== null) {
+              throw new ErrorWithStatus({
+                message: USER_MESSAGES.USERNAME_EXISTED,
+                status: HttpStatusCode.BAD_REQUEST
+              })
+            }
+            return true
+          }
+        }
       },
       avatar: {
-        trim: true
+        trim: true,
+        isString: true
       },
       cover_photo: {
-        trim: true
+        trim: true,
+        isString: true
       }
     },
     ['body']

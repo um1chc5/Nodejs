@@ -21,6 +21,8 @@ export const USER_MESSAGES = {
   EMAIL_VERIFY_TOKEN_UNAVAILABLE: 'Email verify token is unavailable or duplicated',
   EMAIL_VERIFIED: 'Email verified',
   USER_NOT_FOUND: 'User not found',
+  USERNAME_EXISTED: 'User name already exists',
+  INVALID_USERNAME: 'Invalid username',
   VALIDATION_ERROR: 'Validation error',
   RESEND_VERIFY_EMAIL_SUCCESSFULLY: 'Resend verify email successfully',
   FORGOT_PASSWORD_TOKEN_VALID: 'Forgot password token is valid',
