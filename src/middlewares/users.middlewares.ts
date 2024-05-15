@@ -451,6 +451,39 @@ export const followValidator = validate(
   })
 )
 
+export const changePasswordValidator = validate(
+  checkSchema({
+    old_password: {
+      ...passwordSchema,
+      custom: {
+        options: async (value, { req }) => {
+          const user_id = (req as Request).decode_authorization?.user_id
+          const user = await databaseService.users.findOne({
+            _id: new ObjectId(user_id)
+          })
+
+          if (!user) {
+            throw new ErrorWithStatus({
+              message: USER_MESSAGES.USER_NOT_FOUND,
+              status: HttpStatusCode.NOT_FOUND
+            })
+          }
+
+          if (hashPassword(value) !== user?.password) {
+            throw new ErrorWithStatus({
+              message: USER_MESSAGES.OLD_PASSWORD_NOT_MATCH,
+              status: HttpStatusCode.BAD_REQUEST
+            })
+          }
+          req.currentPassword = user.password
+          return true
+        }
+      }
+    },
+    new_password: passwordSchema
+  })
+)
+
 const checkRequiredRefreshToken = (value: string) => {
   if (!value) {
     throw new ErrorWithStatus({

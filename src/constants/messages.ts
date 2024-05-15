@@ -35,5 +35,7 @@ export const USER_MESSAGES = {
   ADD_FOLLOW_SUCCESSFULLY: 'Add follow to profile successfully',
   REMOVE_FOLLOW_SUCCESSFULLY: 'Remove follow from profile successfully',
   FOLLOW_EXISTED: 'This user has already been followed',
-  FOLLOW_NOT_EXISTED: 'This user has not been followed yet'
+  FOLLOW_NOT_EXISTED: 'This user has not been followed yet',
+  OLD_PASSWORD_NOT_MATCH: 'Old password does not match',
+  PASSWORD_NOT_CHANGE: 'New password must be different from old password'
 } as const

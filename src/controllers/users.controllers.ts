@@ -14,6 +14,8 @@ import { ObjectId } from 'mongodb'
 import { UserVerifyStatus } from '~/constants/enum'
 import { omit } from 'lodash'
 import { IUser } from '~/models/schemas/User.schema'
+import { ErrorWithStatus } from '~/models/errors.model'
+import HttpStatusCode from '~/constants/HttpStatusCode.enum'
 
 export const loginController = async (req: Request, res: Response) => {
   const user = req.user
@@ -210,5 +212,26 @@ export const removeFollowController = async (
   await usersService.removeFollow(user_id, followed_user_id)
   return res.status(200).json({
     message: USER_MESSAGES.REMOVE_FOLLOW_SUCCESSFULLY
+  })
+}
+
+export const changePasswordController = async (
+  req: Request<ParamsDictionary, unknown, { old_password: string; new_password: string }>,
+  res: Response
+) => {
+  const { new_password, old_password } = req.body
+
+  if (new_password == old_password) {
+    throw new ErrorWithStatus({
+      message: USER_MESSAGES.PASSWORD_NOT_CHANGE,
+      status: HttpStatusCode.BAD_REQUEST
+    })
+  }
+
+  const user_id = req.decode_authorization?.user_id ?? ''
+
+  await usersService.resetPassword(user_id, req.body.new_password)
+  return res.status(200).json({
+    message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESSFULLY
   })
 }

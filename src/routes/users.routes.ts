@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   addFollowController,
+  changePasswordController,
   forgotPasswordController,
   getMeController,
   getProfileController,
@@ -16,6 +17,7 @@ import {
 } from '~/controllers/users.controllers'
 import {
   accessTokenValidator,
+  changePasswordValidator,
   followValidator,
   forgotPasswordTokenValidator,
   forgotPasswordValidator,
@@ -77,6 +79,13 @@ userRouter.post(
   asyncWrapper(verifiedUserValidator),
   followValidator,
   asyncWrapper(removeFollowController)
+)
+
+userRouter.post(
+  '/change-password',
+  accessTokenValidator,
+  changePasswordValidator,
+  asyncWrapper(changePasswordController)
 )
 
 export default userRouter
