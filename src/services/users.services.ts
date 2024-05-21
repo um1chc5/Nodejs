@@ -8,6 +8,9 @@ import { ObjectId, WithId } from 'mongodb'
 import { RefreshToken } from '~/models/schemas/Tokens.schema'
 import { config } from 'dotenv'
 import { Follower } from '~/models/schemas/Follower.schema'
+import { ErrorWithStatus } from '~/models/errors.model'
+import { USER_MESSAGES } from '~/constants/messages'
+import HttpStatusCode from '~/constants/HttpStatusCode.enum'
 
 config()
 
@@ -285,8 +288,103 @@ class UsersServices {
     })
     return result
   }
+
+  async oauth(code: string) {
+    const { id_token, access_token } = await getOAuthGoogleToken(code)
+    const googleUser = await getGoogleUser({ id_token, access_token })
+
+    if (!googleUser.verified_email) {
+      throw new ErrorWithStatus({
+        message: USER_MESSAGES.USER_NOT_VERIFIED,
+        status: HttpStatusCode.BAD_REQUEST
+      })
+    }
+
+    const user = await databaseService.users.findOne({ email: googleUser.email })
+
+    if (user) {
+      const [access_token, refresh_token] = await this.generateTokens(user._id.toString(), user.verify)
+      await databaseService.refreshToken.insertOne(new RefreshToken({ user_id: user._id, token: refresh_token }))
+      return {
+        access_token,
+        refresh_token,
+        is_new_user: false
+      }
+    } else {
+      const result = await this.register({
+        name: googleUser.name,
+        email: googleUser.email,
+        password: Math.random().toString(36).substring(2, 15),
+        date_of_birth: new Date().toISOString()
+      })
+      return {
+        ...result,
+        is_new_user: true
+      }
+    }
+  }
 }
 
 const usersService = new UsersServices()
 
 export default usersService
+
+interface OAuthGoogleTokenResponse {
+  access_token: string
+  expire_in: number
+  refresh_token: string
+  scope: string
+  token_type: string
+  id_token: string
+}
+
+const getOAuthGoogleToken = async (code: string): Promise<OAuthGoogleTokenResponse> => {
+  const body = {
+    code,
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET,
+    redirect_uri: process.env.GOOGLE_AUTHORIZED_REDIRECT_URI,
+    grant_type: 'authorization_code'
+  }
+
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    body: new URLSearchParams(body),
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  })
+
+  const data = await res.json()
+
+  return data
+}
+
+interface GoogleUserResponse {
+  id: string
+  email: string
+  verified_email: boolean
+  name: string
+  given_name: string
+  family_name: string
+  picture: string
+  locale: string
+}
+
+const getGoogleUser = async ({
+  id_token,
+  access_token
+}: {
+  id_token: string
+  access_token: string
+}): Promise<GoogleUserResponse> => {
+  const res = await fetch('https://www.googleapis.com/oauth2/v1/userinfo?access_token=' + access_token + '&alt=json', {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${id_token}`
+    }
+  })
+  const data = await res.json()
+  console.log(data)
+  return data
+}

@@ -5,6 +5,7 @@ import {
   forgotPasswordController,
   getMeController,
   getProfileController,
+  googleOAuthController,
   loginController,
   logoutController,
   registerController,
@@ -87,5 +88,7 @@ userRouter.post(
   changePasswordValidator,
   asyncWrapper(changePasswordController)
 )
+
+userRouter.get('/oauth/google', asyncWrapper(googleOAuthController))
 
 export default userRouter

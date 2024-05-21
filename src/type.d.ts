@@ -27,6 +27,9 @@ declare global {
       REFRESH_TOKEN_EXPIRE: string
       EMAIL_VERIFY_TOKEN_EXPIRE: string
       FORGOT_PASSWORD_TOKEN_EXPIRE: string
+      GOOGLE_CLIENT_ID: string
+      GOOGLE_CLIENT_SECRET: string
+      GOOGLE_AUTHORIZED_REDIRECT_URI: string
     }
   }
 }

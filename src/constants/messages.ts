@@ -37,5 +37,6 @@ export const USER_MESSAGES = {
   FOLLOW_EXISTED: 'This user has already been followed',
   FOLLOW_NOT_EXISTED: 'This user has not been followed yet',
   OLD_PASSWORD_NOT_MATCH: 'Old password does not match',
-  PASSWORD_NOT_CHANGE: 'New password must be different from old password'
+  PASSWORD_NOT_CHANGE: 'New password must be different from old password',
+  EMAIL_NOT_VERIFIED: 'Email is not verified'
 } as const

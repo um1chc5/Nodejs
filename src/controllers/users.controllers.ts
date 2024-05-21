@@ -235,3 +235,14 @@ export const changePasswordController = async (
     message: USER_MESSAGES.CHANGE_PASSWORD_SUCCESSFULLY
   })
 }
+
+export const googleOAuthController = async (
+  req: Request<ParamsDictionary, unknown, unknown, { code: string }>,
+  res: Response
+) => {
+  const { code } = req.query
+
+  const { access_token, refresh_token, is_new_user } = await usersService.oauth(code)
+
+  return res.redirect(`http://localhost:3000/login/oauth?access_token=${access_token}&refresh_token=${refresh_token}`)
+}
