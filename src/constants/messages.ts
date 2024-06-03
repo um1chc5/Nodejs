@@ -40,3 +40,7 @@ export const USER_MESSAGES = {
   PASSWORD_NOT_CHANGE: 'New password must be different from old password',
   EMAIL_NOT_VERIFIED: 'Email is not verified'
 } as const
+
+export const MEDIA_MESSAGES = {
+  UPLOAD_IMAGE_SUCCESSFULLY: 'Upload image successfully'
+} as const
