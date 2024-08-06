@@ -29,18 +29,17 @@ export const handleUploadImage = async (req: Request) => {
     }
   })
 
-  return new Promise<File>((resolve, reject) => {
+  return new Promise<File[]>((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
       if (err) {
         console.log(err)
         return reject(err)
       }
-      console.log(files.image)
-      if (!files.image || files.image?.length === 0) {
+      if (files.image?.length === 0) {
         console.log('reject')
         return reject(new Error('File is Empty'))
       }
-      resolve(files.image[0] as unknown as File)
+      resolve(files.image as File[])
     })
   })
 }
