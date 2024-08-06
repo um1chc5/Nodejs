@@ -1,7 +1,7 @@
 import { Request } from 'express'
 import sharp from 'sharp'
 import { UPLOAD_IMAGE_DIR } from '~/constants/dir'
-import { handleUploadImage } from '~/utils/file'
+import { handleUploadImage, handleUploadVideo } from '~/utils/file'
 import fs from 'fs'
 import { isProduction } from '~/constants/config'
 import { Media } from '~/models/others.mode'
@@ -20,12 +20,25 @@ class MediaServices {
         return {
           url: isProduction
             ? `${process.env.HOST}/static/${newFilename}.jpg`
-            : `http://localhost:${process.env.PORT}/static/${newFilename}.jpg`,
-          type: MediaType.image
+            : `http://localhost:${process.env.PORT}/static/images/${newFilename}.jpg`,
+          type: MediaType.Image
         }
       })
     )
     return result
+  }
+
+  async uploadVideo(req: Request) {
+    const file = (await handleUploadVideo(req))[0]
+    const { newFilename } = file
+    return [
+      {
+        url: isProduction
+          ? `${process.env.HOST}/static/${newFilename}`
+          : `http://localhost:${process.env.PORT}/static/videos/${newFilename}`,
+        type: MediaType.Video
+      }
+    ]
   }
 }
 

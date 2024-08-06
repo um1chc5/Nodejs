@@ -6,6 +6,7 @@ import mediaRouter from './routes/media.routes'
 import { initFolder } from './utils/file'
 import { UPLOAD_IMAGE_DIR } from './constants/dir'
 import { serveStaticImage } from './controllers/media.controllers'
+import staticRoute from './routes/static.routes'
 
 const app = express()
 const port = process.env.PORT
@@ -17,7 +18,7 @@ databaseService.connect()
 app.use(express.json())
 app.use('/users', userRouter)
 app.use('/media', mediaRouter)
-app.use('/static/:image', serveStaticImage)
+app.use('/static', staticRoute)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {
