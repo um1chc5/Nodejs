@@ -6,6 +6,7 @@ import mediaRouter from './routes/media.routes'
 import { initFolder } from './utils/file'
 import { UPLOAD_VIDEO_DIR } from './constants/dir'
 import staticRoute from './routes/static.routes'
+import cors from 'cors'
 
 const app = express()
 const port = process.env.PORT
@@ -14,6 +15,7 @@ initFolder()
 
 databaseService.connect()
 
+app.use(cors())
 app.use(express.json())
 app.use('/users', userRouter)
 app.use('/media', mediaRouter)

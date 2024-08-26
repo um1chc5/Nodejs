@@ -75,3 +75,33 @@ export const serveStaticStreamingVideo = async (req: Request, res: Response) => 
   const videoStream = createReadStream(videoPath, { start, end })
   videoStream.pipe(res)
 }
+
+export const uploadVideoHLSController = async (req: Request, res: Response) => {
+  const url = await mediaServices.uploadVideoHLS(req)
+  return res.status(200).json({
+    message: MEDIA_MESSAGES.UPLOAD_IMAGE_SUCCESSFULLY,
+    source: url
+  })
+}
+
+export const serverM3u8Controller = async (req: Request, res: Response) => {
+  const { id } = req.params
+  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, 'master.m3u8'), (err) => {
+    if (err) {
+      res.status((err as any).status).json({
+        message: err.message
+      })
+    }
+  })
+}
+
+export const serverTransportStreamController = async (req: Request, res: Response) => {
+  const { id, v, segment } = req.params
+  return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, v, segment), (err) => {
+    if (err) {
+      res.status((err as any).status).json({
+        message: err.message
+      })
+    }
+  })
+}
