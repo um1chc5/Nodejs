@@ -4,6 +4,7 @@ import {
   changePasswordController,
   forgotPasswordController,
   getMeController,
+  refreshTokensPairController,
   getProfileController,
   googleOAuthController,
   loginController,
@@ -37,6 +38,8 @@ const userRouter = Router()
 userRouter.post('/login', loginValidator, asyncWrapper(loginController))
 
 userRouter.post('/register', registerValidator, asyncWrapper(registerController))
+
+userRouter.post('/refresh-tokens-pair', refreshTokenValidator, asyncWrapper(refreshTokensPairController))
 
 userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, asyncWrapper(logoutController))
 

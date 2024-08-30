@@ -31,6 +31,22 @@ class DatabaseService {
     }
   }
 
+  createIndexUsers() {
+    this.users.createIndex({ username: 1, password: 1 })
+    this.users.createIndex({ email: 1 }, { unique: true })
+    this.users.createIndex({ username: 1 }, { unique: true })
+  }
+
+  createIndexToken() {
+    this.refreshToken.createIndex({ token: 1 })
+    this.refreshToken.createIndex(
+      { exp: 1 },
+      {
+        expireAfterSeconds: 0
+      }
+    )
+  }
+
   get users() {
     return this.db.collection<IUser>(process.env.DB_USER)
   }

@@ -9,6 +9,7 @@ export const USER_MESSAGES = {
   REQUIRED_USER_ID: 'Username is required',
   INVALID_USER_ID: 'User id is invalid',
   CHANGE_PASSWORD_SUCCESSFULLY: 'Change password successfully',
+  REFRESH_TOKEN_SUCCESSFULLY: 'Refresh token successfully',
   REFRESH_TOKEN_INVALID: 'Refresh token is invalid',
   REFRESH_TOKEN_UNAVAILABLE: 'Refresh token is unavailable or duplicated',
   EXISTED_EMAIL: 'Email is already existed',

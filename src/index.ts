@@ -13,7 +13,10 @@ const port = process.env.PORT
 
 initFolder()
 
-databaseService.connect()
+databaseService.connect().then(() => {
+  databaseService.createIndexUsers()
+  databaseService.createIndexToken()
+})
 
 app.use(cors())
 app.use(express.json())

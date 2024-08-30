@@ -20,6 +20,7 @@ export const loginController = async (req: Request, res: Response) => {
   const user = req.user
   if (user) {
     const result = await usersService.login(user)
+    console.log(result)
     return res.status(200).json({
       message: 'Login Successfully',
       result
@@ -34,6 +35,18 @@ export const registerController = async (
   const result = await usersService.register(req.body)
   return res.status(200).json({
     message: USER_MESSAGES.LOGIN_SUCCESSFULLY,
+    result
+  })
+}
+
+export const refreshTokensPairController = async (
+  req: Request<ParamsDictionary, unknown, { refresh_token: string }>,
+  res: Response
+) => {
+  const { decode_refresh_token } = req
+  const result = await usersService.refreshTokensPair(decode_refresh_token, req.body.refresh_token)
+  return res.status(200).json({
+    message: USER_MESSAGES.REFRESH_TOKEN_SUCCESSFULLY,
     result
   })
 }

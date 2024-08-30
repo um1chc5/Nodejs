@@ -7,6 +7,8 @@ interface IRefreshToken {
   token: string
   created_at?: Date
   user_id: ObjectId
+  exp: number
+  iat: number
 }
 
 export class RefreshToken {
@@ -14,11 +16,16 @@ export class RefreshToken {
   token: string
   created_at: Date
   user_id: ObjectId
-  constructor({ _id, created_at, token, user_id }: IRefreshToken) {
+  exp: Date
+  iat: Date
+
+  constructor({ _id, created_at, token, user_id, exp, iat }: IRefreshToken) {
     this._id = _id
     this.created_at = created_at || new Date()
     this.token = token
     this.user_id = user_id
+    this.exp = new Date(exp * 1000)
+    this.iat = new Date(iat * 1000)
   }
 }
 
