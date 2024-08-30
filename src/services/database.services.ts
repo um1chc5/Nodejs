@@ -1,9 +1,9 @@
 import { config } from 'dotenv'
 import { Db, MongoClient } from 'mongodb'
-import { dbCollections } from '~/constants/dbCollections.constant'
 import { IFollower } from '~/models/schemas/Follower.schema'
 import { RefreshToken } from '~/models/schemas/Tokens.schema'
 import { IUser } from '~/models/schemas/User.schema'
+import VideoStatus from '~/models/schemas/VideoStatus.schema'
 
 config()
 
@@ -44,7 +44,7 @@ class DatabaseService {
   }
 
   get videoStatus() {
-    return this.db.collection(process.env.DB_VIDEO_STATUS_COLLECTION)
+    return this.db.collection<VideoStatus>(process.env.DB_VIDEO_STATUS_COLLECTION)
   }
 }
 

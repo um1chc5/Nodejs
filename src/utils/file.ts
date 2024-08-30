@@ -58,10 +58,10 @@ export const handleUploadVideo = async (req: Request, type: 'hls' | 'static-stre
 
   const form = formidable({
     uploadDir: folderPath,
-    maxFiles: 1,
+    maxFiles: 4,
     keepExtensions: true,
-    maxFileSize: 50 * 1024 * 1024,
-    maxTotalFileSize: 50 * 1024 * 1024,
+    maxFileSize: 30 * 1024 * 1024,
+    maxTotalFileSize: 4 * 30 * 1024 * 1024,
     filter: function ({ name, mimetype }) {
       const valid = name === 'video' || mimetype?.includes('mp4') || mimetype?.includes('quicktime')
       if (!valid) {
@@ -88,3 +88,5 @@ export const handleUploadVideo = async (req: Request, type: 'hls' | 'static-stre
     })
   })
 }
+
+export const getNameFromFullName = (name: string) => name.split('.')[0]
