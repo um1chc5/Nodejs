@@ -30,7 +30,7 @@ class MediaServices {
   }
 
   async uploadVideo(req: Request) {
-    const files = await handleUploadVideo(req)
+    const files = await handleUploadVideo(req, 'static-stream')
     const result: Media[] = await Promise.all(
       files.map(async (file) => {
         const { newFilename } = file
@@ -46,18 +46,18 @@ class MediaServices {
   }
 
   async uploadVideoHLS(req: Request) {
-    const files = await handleUploadVideo(req)
+    const files = await handleUploadVideo(req, 'hls')
 
     const result: Media[] = await Promise.all(
       files.map(async (file) => {
         await encodeHLSWithMultipleVideoStreams(file.filepath)
         await fsPromise.unlink(file.filepath)
-        const { newFilename } = file
+        const newFilename = file.newFilename.split('.')[0]
 
         return {
           url: isProduction
             ? `${process.env.HOST}/static/${newFilename}`
-            : `http://localhost:${process.env.PORT}/static/video-hls/${newFilename}`,
+            : `http://localhost:${process.env.PORT}/static/video-hls/${newFilename}/`,
           type: MediaType.Video
         }
       })

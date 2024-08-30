@@ -42,5 +42,7 @@ export const USER_MESSAGES = {
 } as const
 
 export const MEDIA_MESSAGES = {
-  UPLOAD_IMAGE_SUCCESSFULLY: 'Upload image successfully'
+  UPLOAD_IMAGE_SUCCESSFULLY: 'Upload image successfully',
+  UPLOAD_VIDEO_SUCCESSFULLY: 'Upload video successfully',
+  UPLOAD_VIDEO_HLS_SUCCESSFULLY: 'Upload HLS video successfully'
 } as const

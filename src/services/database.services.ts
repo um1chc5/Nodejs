@@ -32,15 +32,19 @@ class DatabaseService {
   }
 
   get users() {
-    return this.db.collection<IUser>(dbCollections.users)
+    return this.db.collection<IUser>(process.env.DB_USER)
   }
 
   get refreshToken() {
-    return this.db.collection<RefreshToken>(dbCollections.refresh_token)
+    return this.db.collection<RefreshToken>(process.env.DB_REFRESH_TOKEN)
   }
 
   get followers() {
-    return this.db.collection<IFollower>(dbCollections.followers)
+    return this.db.collection<IFollower>(process.env.DB_FOLLOWERS)
+  }
+
+  get videoStatus() {
+    return this.db.collection(process.env.DB_VIDEO_STATUS_COLLECTION)
   }
 }
 

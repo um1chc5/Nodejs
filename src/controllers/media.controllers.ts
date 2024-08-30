@@ -20,7 +20,7 @@ export const uploadImageController = async (req: Request, res: Response) => {
 export const uploadVideoController = async (req: Request, res: Response) => {
   const url = await mediaServices.uploadVideo(req)
   return res.status(200).json({
-    message: MEDIA_MESSAGES.UPLOAD_IMAGE_SUCCESSFULLY,
+    message: MEDIA_MESSAGES.UPLOAD_VIDEO_SUCCESSFULLY,
     source: url
   })
 }
@@ -79,7 +79,7 @@ export const serveStaticStreamingVideo = async (req: Request, res: Response) => 
 export const uploadVideoHLSController = async (req: Request, res: Response) => {
   const url = await mediaServices.uploadVideoHLS(req)
   return res.status(200).json({
-    message: MEDIA_MESSAGES.UPLOAD_IMAGE_SUCCESSFULLY,
+    message: MEDIA_MESSAGES.UPLOAD_VIDEO_HLS_SUCCESSFULLY,
     source: url
   })
 }
@@ -95,6 +95,7 @@ export const serverM3u8Controller = async (req: Request, res: Response) => {
   })
 }
 
+// Server TS file for hls streaming
 export const serverTransportStreamController = async (req: Request, res: Response) => {
   const { id, v, segment } = req.params
   return res.sendFile(path.resolve(UPLOAD_VIDEO_DIR, id, v, segment), (err) => {

@@ -46,13 +46,15 @@ export const handleUploadImage = async (req: Request) => {
   })
 }
 
-export const handleUploadVideo = async (req: Request) => {
+export const handleUploadVideo = async (req: Request, type: 'hls' | 'static-stream' = 'static-stream') => {
   const formidable = (await import('formidable')).default
   const nanoid = (await import('nanoid')).nanoid
   const idName = nanoid()
-  const folderPath = path.resolve(UPLOAD_VIDEO_DIR, idName)
+  const folderPath = type === 'hls' ? path.resolve(UPLOAD_VIDEO_DIR, idName) : path.resolve(UPLOAD_VIDEO_DIR)
 
-  fs.mkdirSync(folderPath)
+  if (type === 'hls') {
+    fs.mkdirSync(folderPath)
+  }
 
   const form = formidable({
     uploadDir: folderPath,
