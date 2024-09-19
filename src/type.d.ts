@@ -23,6 +23,8 @@ declare global {
       DB_REFRESH_TOKEN: string
       DB_FOLLOWERS: string
       DB_VIDEO_STATUS_COLLECTION: string
+      DB_TWEETS: string
+      DB_HASHTAGS: string
       PASSWORD_SECRET: string
       JWT_SECRET_ACCESS_TOKEN: string
       JWT_SECRET_REFRESH_TOKEN: string

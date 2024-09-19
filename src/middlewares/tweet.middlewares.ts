@@ -33,7 +33,7 @@ export const createTweetValidator = validate(
           const mentions = req.body.mentions as string[]
 
           if (
-            [TweetType.Comment, TweetType.QuoteTweet, TweetType.Retweet].includes(type) &&
+            [TweetType.Comment, TweetType.QuoteTweet, TweetType.Tweet].includes(type) &&
             isEmpty(hashtags) &&
             isEmpty(mentions) &&
             value === ''
@@ -41,7 +41,7 @@ export const createTweetValidator = validate(
             throw new Error(TWEET_MESSAGES.CONTENT_NOT_EMPTY_STRING)
           }
 
-          if (type === TweetType.Tweet && value !== '') {
+          if (type === TweetType.Retweet && value !== '') {
             throw new Error(TWEET_MESSAGES.CONTENT_MUST_EMPTY_STRING)
           }
           return true

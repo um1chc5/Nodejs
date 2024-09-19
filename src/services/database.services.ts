@@ -1,7 +1,9 @@
 import { config } from 'dotenv'
 import { Db, MongoClient } from 'mongodb'
 import { IFollower } from '~/models/schemas/Follower.schema'
+import Hashtag from '~/models/schemas/Hashtag.schema'
 import { RefreshToken } from '~/models/schemas/Tokens.schema'
+import Tweet from '~/models/schemas/Tweet.schema'
 import { IUser } from '~/models/schemas/User.schema'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
 
@@ -61,6 +63,14 @@ class DatabaseService {
 
   get videoStatus() {
     return this.db.collection<VideoStatus>(process.env.DB_VIDEO_STATUS_COLLECTION)
+  }
+
+  get tweets() {
+    return this.db.collection<Tweet>(process.env.DB_TWEETS)
+  }
+
+  get hashtags() {
+    return this.db.collection<Hashtag>(process.env.DB_HASHTAGS)
   }
 }
 
