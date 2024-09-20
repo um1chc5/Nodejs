@@ -3,16 +3,16 @@ import { ObjectId } from 'mongodb'
 interface HashtagType {
   _id?: ObjectId
   name: string
-  updated_at?: Date
+  created_at?: Date
 }
 
 export default class Hashtag {
   _id?: ObjectId
   name: string
-  updated_at?: Date
-  constructor({ _id, name, updated_at }: HashtagType) {
+  created_at?: Date
+  constructor({ _id, name, created_at }: HashtagType) {
     this._id = _id
     this.name = name
-    this.updated_at = updated_at
+    this.created_at = created_at ?? new Date()
   }
 }

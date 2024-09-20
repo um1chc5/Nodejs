@@ -2,23 +2,32 @@ import { TweetRequestBody } from '~/models/requests/tweet.request'
 import databaseService from './database.services'
 import Tweet from '~/models/schemas/Tweet.schema'
 import { ObjectId } from 'mongodb'
+import Hashtag from '~/models/schemas/Hashtag.schema'
+import { has } from 'lodash'
 
 class TweetService {
-  async createTweet(body: TweetRequestBody) {
-    const { hashtags, mentions } = body
+  async createTweet(body: TweetRequestBody, user_id: string) {
+    const { hashtags } = body
     const finalHashtags = await Promise.all(
-      hashtags.map(async (hashtag) => {
-        const result = await databaseService.hashtags.findOne({ name: hashtag })
-        if (!result) {
-          const new_id = new ObjectId()
-          await databaseService.hashtags.insertOne({ _id: new_id, name: hashtag })
-          return new_id
-        }
-        return result._id
+      hashtags.map((hashtag) => {
+        return databaseService.hashtags
+          .findOneAndUpdate(
+            { name: hashtag },
+            {
+              $setOnInsert: new Hashtag({ name: hashtag, _id: new ObjectId() })
+            },
+            {
+              upsert: true,
+              returnDocument: 'after'
+            }
+          )
+          .then((value) => {
+            return value._id
+          })
       })
     )
 
-    databaseService.tweets.insertOne(
+    return await databaseService.tweets.insertOne(
       new Tweet({
         audience: body.audience,
         content: body.content,
@@ -26,7 +35,8 @@ class TweetService {
         type: body.type,
         hashtags: finalHashtags,
         mentions: body.mentions,
-        parent_id: body.parent_id
+        parent_id: body.parent_id,
+        user_id: new ObjectId(user_id)
       })
     )
   }
