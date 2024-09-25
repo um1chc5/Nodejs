@@ -49,6 +49,7 @@ export const MEDIA_MESSAGES = {
 } as const
 
 export const TWEET_MESSAGES = {
+  INVALID_TWEET_ID: 'Invalid tweet id or tweet id is not found',
   INVALID_TWEET_TYPE: 'Invalid tweet type',
   INVALID_TWEET_AUDIENCE: 'Invalid tweet audience',
   PARENT_ID_REQUIRED: 'Parent ID required',
@@ -58,4 +59,9 @@ export const TWEET_MESSAGES = {
   HASHTAGS_MUST_STRINGS: 'Hashtags must be an array of strings',
   MENTION_INVALID_USER_ID: 'Mention invalid user id',
   INVALID_MEDIA_OBJECT: 'Invalid media object'
+} as const
+
+export const BOOKMARK_MESSAGES = {
+  ADD_BOOKMARK_SUCCESSFULLY: 'Add bookmark successfully',
+  DELETE_BOOKMARK_SUCCESSFULLY: 'Delete bookmark successfully'
 } as const

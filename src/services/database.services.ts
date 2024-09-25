@@ -1,5 +1,6 @@
 import { config } from 'dotenv'
 import { Db, MongoClient } from 'mongodb'
+import { Bookmark } from '~/models/schemas/Bookmark.schema'
 import { IFollower } from '~/models/schemas/Follower.schema'
 import Hashtag from '~/models/schemas/Hashtag.schema'
 import { RefreshToken } from '~/models/schemas/Tokens.schema'
@@ -71,6 +72,10 @@ class DatabaseService {
 
   get hashtags() {
     return this.db.collection<Hashtag>(process.env.DB_HASHTAGS)
+  }
+
+  get bookmarks() {
+    return this.db.collection<Bookmark>(process.env.DB_BOOKMARK)
   }
 }
 

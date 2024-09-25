@@ -25,6 +25,7 @@ declare global {
       DB_VIDEO_STATUS_COLLECTION: string
       DB_TWEETS: string
       DB_HASHTAGS: string
+      DB_BOOKMARK: string
       PASSWORD_SECRET: string
       JWT_SECRET_ACCESS_TOKEN: string
       JWT_SECRET_REFRESH_TOKEN: string
