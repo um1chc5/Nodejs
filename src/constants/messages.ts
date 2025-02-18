@@ -65,3 +65,8 @@ export const BOOKMARK_MESSAGES = {
   ADD_BOOKMARK_SUCCESSFULLY: 'Add bookmark successfully',
   DELETE_BOOKMARK_SUCCESSFULLY: 'Delete bookmark successfully'
 } as const
+
+export const LIKE_MESSAGES = {
+  ADD_LIKE_SUCCESSFULLY: 'Add like successfully',
+  UNLIKE_SUCCESSFULLY: 'Unlike successfully'
+}

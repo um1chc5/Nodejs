@@ -77,6 +77,10 @@ class DatabaseService {
   get bookmarks() {
     return this.db.collection<Bookmark>(process.env.DB_BOOKMARK)
   }
+
+  get likes() {
+    return this.db.collection(process.env.DB_LIKES)
+  }
 }
 
 const databaseService = new DatabaseService()

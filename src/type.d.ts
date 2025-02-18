@@ -26,6 +26,7 @@ declare global {
       DB_TWEETS: string
       DB_HASHTAGS: string
       DB_BOOKMARK: string
+      DB_LIKES: string
       PASSWORD_SECRET: string
       JWT_SECRET_ACCESS_TOKEN: string
       JWT_SECRET_REFRESH_TOKEN: string

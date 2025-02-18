@@ -9,6 +9,7 @@ import staticRoute from './routes/static.routes'
 import cors from 'cors'
 import tweetRouter from './routes/tweet.routes'
 import bookMarkRouter from './routes/bookmark.routes'
+import likeRouter from './routes/like.routes'
 
 const app = express()
 const port = process.env.PORT
@@ -28,6 +29,7 @@ app.use('/static', staticRoute)
 app.use('/static/videos', express.static(UPLOAD_VIDEO_DIR)) // Express static serving is more stable than  res.sendFile for serving videos.
 app.use('/tweets', tweetRouter)
 app.use('/bookmarks', bookMarkRouter)
+app.use('/likes', likeRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {
