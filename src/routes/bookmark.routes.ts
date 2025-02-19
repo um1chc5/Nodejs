@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { addBookmarkController, deleteBookmarkController } from '~/controllers/bookmark.controllers'
-import { bookmarkValidator } from '~/middlewares/bookmark.middlewares'
+import { tweetIdValidator } from '~/middlewares/tweet.middlewares'
 import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users.middlewares'
 import { asyncWrapper } from '~/utils/asyncWrapper'
 
@@ -10,10 +10,16 @@ bookMarkRouter.post(
   '/',
   accessTokenValidator,
   verifiedUserValidator,
-  bookmarkValidator,
+  tweetIdValidator,
   asyncWrapper(addBookmarkController)
 )
 
-bookMarkRouter.delete('/:tweet_id', accessTokenValidator, verifiedUserValidator, asyncWrapper(deleteBookmarkController))
+bookMarkRouter.delete(
+  '/:tweet_id',
+  accessTokenValidator,
+  verifiedUserValidator,
+  tweetIdValidator,
+  asyncWrapper(deleteBookmarkController)
+)
 
 export default bookMarkRouter

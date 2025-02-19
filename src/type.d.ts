@@ -1,6 +1,7 @@
 import { WithId } from 'mongodb'
 import { IUser } from './models/schemas/User.schema'
 import { TokenPayload } from './models/schemas/Tokens.schema'
+import Tweet from './models/schemas/Tweet.schema'
 
 declare module 'express' {
   interface Request {
@@ -10,6 +11,7 @@ declare module 'express' {
     decode_forgot_password_token?: TokenPayload
     decode_refresh_token?: TokenPayload
     currentPassword?: string
+    tweet?: Tweet
   }
 }
 

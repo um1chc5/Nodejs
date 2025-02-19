@@ -58,7 +58,8 @@ export const TWEET_MESSAGES = {
   CONTENT_MUST_EMPTY_STRING: 'Content must be empty string',
   HASHTAGS_MUST_STRINGS: 'Hashtags must be an array of strings',
   MENTION_INVALID_USER_ID: 'Mention invalid user id',
-  INVALID_MEDIA_OBJECT: 'Invalid media object'
+  INVALID_MEDIA_OBJECT: 'Invalid media object',
+  NOT_IN_TWITTER_CIRCLE: 'You are not in the Twitter circle',
 } as const
 
 export const BOOKMARK_MESSAGES = {

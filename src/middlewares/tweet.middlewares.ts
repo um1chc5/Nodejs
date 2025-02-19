@@ -1,10 +1,15 @@
+import { NextFunction, Request, Response } from 'express'
 import { checkSchema } from 'express-validator'
 import { isEmpty } from 'lodash'
 import { ObjectId } from 'mongodb'
-import { MediaType, TweetAudience, TweetType } from '~/constants/enum'
-import { TWEET_MESSAGES } from '~/constants/messages'
+import { MediaType, TweetAudience, TweetType, UserVerifyStatus } from '~/constants/enum'
+import HttpStatusCode from '~/constants/HttpStatusCode.enum'
+import { TWEET_MESSAGES, USER_MESSAGES } from '~/constants/messages'
+import { ErrorWithStatus } from '~/models/errors.model'
+import databaseService from '~/services/database.services'
 import { getEnumValues } from '~/utils/other'
 import validate from '~/utils/validations'
+import { asyncWrapper } from './../utils/asyncWrapper'
 
 const tweetTypes = getEnumValues(TweetType)
 const tweetAudiences = getEnumValues(TweetAudience)
@@ -106,3 +111,68 @@ export const createTweetValidator = validate(
     }
   })
 )
+
+export const tweetIdValidator = validate(
+  checkSchema(
+    {
+      tweet_id: {
+        isMongoId: {
+          errorMessage: TWEET_MESSAGES.INVALID_TWEET_ID
+        },
+        custom: {
+          options: async (value, { req }) => {
+            if (!ObjectId.isValid(value)) {
+              throw new ErrorWithStatus({
+                message: TWEET_MESSAGES.INVALID_TWEET_ID,
+                status: HttpStatusCode.BAD_REQUEST
+              })
+            }
+            const tweet = await databaseService.tweets.findOne({ _id: new ObjectId(value) })
+            if (!tweet) {
+              throw new ErrorWithStatus({
+                message: TWEET_MESSAGES.INVALID_TWEET_ID,
+                status: HttpStatusCode.NOT_FOUND
+              })
+            }
+            req.tweet = tweet
+            return true
+          }
+        }
+      }
+    },
+    ['params', 'body']
+  )
+)
+
+export const audienceValidator = asyncWrapper(async (req: Request, res: Response, next: NextFunction) => {
+  const tweet = req.tweet
+  if (tweet.audience === TweetAudience.TwitterCircle) {
+    // Check if user is logged in
+    if (!req.decode_authorization) {
+      throw new ErrorWithStatus({
+        status: HttpStatusCode.UNAUTHORIZED,
+        message: USER_MESSAGES.REQUIRED_ACCESS_TOKEN
+      })
+    }
+    // check user account (deleted or locked case)
+    const author = await databaseService.users.findOne({ _id: new ObjectId(tweet.user_id) })
+    if (!author || author.verify === UserVerifyStatus.Banned) {
+      throw new ErrorWithStatus({
+        status: HttpStatusCode.NOT_FOUND,
+        message: USER_MESSAGES.USER_NOT_FOUND
+      })
+    }
+
+    const { user_id } = req.decode_authorization
+    const isInTwitterCircle = Boolean(author.tweet_circle?.some((id) => id.equals(user_id)))
+
+    if (!isInTwitterCircle && !author._id.equals(user_id)) {
+      throw new ErrorWithStatus({
+        status: HttpStatusCode.FORBIDDEN,
+        message: TWEET_MESSAGES.NOT_IN_TWITTER_CIRCLE
+      })
+    }
+    next()
+  }
+  next()
+})
