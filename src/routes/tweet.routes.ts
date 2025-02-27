@@ -15,7 +15,7 @@ tweetRouter.get(
   isUserLoggedInValidator(verifiedUserValidator),
   tweetIdValidator,
   audienceValidator,
-  getTweetController
+  asyncWrapper(getTweetController)
 )
 
 export default tweetRouter

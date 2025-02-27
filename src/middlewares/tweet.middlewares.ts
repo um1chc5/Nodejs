@@ -10,6 +10,7 @@ import databaseService from '~/services/database.services'
 import { getEnumValues } from '~/utils/other'
 import validate from '~/utils/validations'
 import { asyncWrapper } from './../utils/asyncWrapper'
+import Tweet from '~/models/schemas/Tweet.schema'
 
 const tweetTypes = getEnumValues(TweetType)
 const tweetAudiences = getEnumValues(TweetAudience)
@@ -127,7 +128,120 @@ export const tweetIdValidator = validate(
                 status: HttpStatusCode.BAD_REQUEST
               })
             }
-            const tweet = await databaseService.tweets.findOne({ _id: new ObjectId(value) })
+            const [tweet] = await databaseService.tweets
+              .aggregate<Tweet>([
+                {
+                  $match: {
+                    _id: ObjectId.createFromHexString(value)
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'hashtags',
+                    localField: 'hashtags',
+                    foreignField: '_id',
+                    as: 'hashtags'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'users',
+                    localField: 'mentions',
+                    foreignField: '_id',
+                    as: 'mentions'
+                  }
+                },
+                {
+                  $addFields: {
+                    mentions: {
+                      $map: {
+                        input: '$mentions',
+                        as: 'mention',
+                        in: {
+                          _id: '$$mention._id',
+                          name: '$$mention.name',
+                          username: '$$mention.username',
+                          email: '$$mention.email'
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'bookmarks',
+                    localField: '_id',
+                    foreignField: 'tweet_id',
+                    as: 'bookmarks'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'likes',
+                    localField: '_id',
+                    foreignField: 'tweet_id',
+                    as: 'likes'
+                  }
+                },
+                {
+                  $lookup: {
+                    from: 'tweets',
+                    localField: '_id',
+                    foreignField: 'parent_id',
+                    as: 'tweet_children'
+                  }
+                },
+                {
+                  $addFields: {
+                    bookmarks: {
+                      $size: '$bookmarks'
+                    },
+                    likes: {
+                      $size: '$likes'
+                    },
+                    retweet_count: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_children',
+                          as: 'item',
+                          cond: {
+                            $eq: ['$$item.type', TweetType.Retweet]
+                          }
+                        }
+                      }
+                    },
+                    comment_count: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_children',
+                          as: 'item',
+                          cond: {
+                            $eq: ['$$item.type', TweetType.Comment]
+                          }
+                        }
+                      }
+                    },
+                    quote_count: {
+                      $size: {
+                        $filter: {
+                          input: '$tweet_children',
+                          as: 'item',
+                          cond: {
+                            $eq: ['$$item.type', TweetType.QuoteTweet]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  $project: {
+                    tweet_children: 0
+                  }
+                }
+              ])
+              .toArray()
+
             if (!tweet) {
               throw new ErrorWithStatus({
                 message: TWEET_MESSAGES.INVALID_TWEET_ID,
@@ -146,33 +260,37 @@ export const tweetIdValidator = validate(
 
 export const audienceValidator = asyncWrapper(async (req: Request, res: Response, next: NextFunction) => {
   const tweet = req.tweet
-  if (tweet.audience === TweetAudience.TwitterCircle) {
-    // Check if user is logged in
-    if (!req.decode_authorization) {
-      throw new ErrorWithStatus({
-        status: HttpStatusCode.UNAUTHORIZED,
-        message: USER_MESSAGES.REQUIRED_ACCESS_TOKEN
-      })
-    }
-    // check user account (deleted or locked case)
-    const author = await databaseService.users.findOne({ _id: new ObjectId(tweet.user_id) })
-    if (!author || author.verify === UserVerifyStatus.Banned) {
-      throw new ErrorWithStatus({
-        status: HttpStatusCode.NOT_FOUND,
-        message: USER_MESSAGES.USER_NOT_FOUND
-      })
-    }
 
-    const { user_id } = req.decode_authorization
-    const isInTwitterCircle = Boolean(author.tweet_circle?.some((id) => id.equals(user_id)))
-
-    if (!isInTwitterCircle && !author._id.equals(user_id)) {
-      throw new ErrorWithStatus({
-        status: HttpStatusCode.FORBIDDEN,
-        message: TWEET_MESSAGES.NOT_IN_TWITTER_CIRCLE
-      })
-    }
-    next()
+  if (tweet.audience !== TweetAudience.TwitterCircle) {
+    return next() // Skip validation if the audience is not Twitter Circle
   }
-  next()
+
+  // Check if user is logged in
+  if (!req.decode_authorization) {
+    throw new ErrorWithStatus({
+      status: HttpStatusCode.UNAUTHORIZED,
+      message: USER_MESSAGES.REQUIRED_ACCESS_TOKEN
+    })
+  }
+
+  // Check if user account is deleted or locked
+  const author = await databaseService.users.findOne({ _id: new ObjectId(tweet.user_id) })
+  if (!author || author.verify === UserVerifyStatus.Banned) {
+    throw new ErrorWithStatus({
+      status: HttpStatusCode.NOT_FOUND,
+      message: USER_MESSAGES.USER_NOT_FOUND
+    })
+  }
+
+  const { user_id } = req.decode_authorization
+  const isInTwitterCircle = Boolean(author.tweet_circle?.some((id) => id.equals(user_id)))
+
+  if (!isInTwitterCircle && !author._id.equals(user_id)) {
+    throw new ErrorWithStatus({
+      status: HttpStatusCode.FORBIDDEN,
+      message: TWEET_MESSAGES.NOT_IN_TWITTER_CIRCLE
+    })
+  }
+
+  next() // Only one next() call at the end
 })
