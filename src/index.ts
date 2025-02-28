@@ -10,6 +10,7 @@ import cors from 'cors'
 import tweetRouter from './routes/tweet.routes'
 import bookMarkRouter from './routes/bookmark.routes'
 import likeRouter from './routes/like.routes'
+import './utils/fake'
 
 const app = express()
 const port = process.env.PORT
