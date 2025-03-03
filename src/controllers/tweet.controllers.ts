@@ -46,3 +46,19 @@ export const getTweetChildrenController = async (req: Request, res: Response) =>
     }
   })
 }
+
+export const getNewFeedsController = async (req: Request, res: Response) => {
+  const limit = Number(req.query.limit)
+  const page = Number(req.query.page)
+  const user_id = req.decode_authorization.user_id
+  const { tweets, total } = await tweetService.getNewFeeds({ limit, page, user_id })
+  return res.json({
+    message: 'Get new feeds successfully',
+    result: {
+      tweets,
+      limit,
+      page,
+      total_page: Math.ceil(total / limit)
+    }
+  })
+}

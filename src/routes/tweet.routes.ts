@@ -2,7 +2,12 @@ import { Router } from 'express'
 import { accessTokenValidator, isUserLoggedInValidator } from '~/middlewares/users.middlewares'
 import { verifiedUserValidator } from './../middlewares/users.middlewares'
 import { asyncWrapper } from '~/utils/asyncWrapper'
-import { getTweetChildrenController, getTweetController, tweetController } from '~/controllers/tweet.controllers'
+import {
+  getNewFeedsController,
+  getTweetChildrenController,
+  getTweetController,
+  tweetController
+} from '~/controllers/tweet.controllers'
 import { audienceValidator, createTweetValidator, tweetIdValidator } from '~/middlewares/tweet.middlewares'
 
 const tweetRouter = Router()
@@ -27,5 +32,11 @@ tweetRouter.get(
   asyncWrapper(getTweetChildrenController)
 )
 
+tweetRouter.get(
+  '/',
+  accessTokenValidator,
+  verifiedUserValidator,
+  asyncWrapper(getNewFeedsController)
+)
 
 export default tweetRouter
