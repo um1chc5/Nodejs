@@ -11,6 +11,7 @@ import tweetRouter from './routes/tweet.routes'
 import bookMarkRouter from './routes/bookmark.routes'
 import likeRouter from './routes/like.routes'
 import './utils/fake'
+import searchRouter from './routes/search.routes'
 
 const app = express()
 const port = process.env.PORT
@@ -20,6 +21,7 @@ initFolder()
 databaseService.connect().then(() => {
   databaseService.createIndexUsers()
   databaseService.createIndexToken()
+  databaseService.indexTweets()
 })
 
 app.use(cors())
@@ -31,6 +33,7 @@ app.use('/static/videos', express.static(UPLOAD_VIDEO_DIR)) // Express static se
 app.use('/tweets', tweetRouter)
 app.use('/bookmarks', bookMarkRouter)
 app.use('/likes', likeRouter)
+app.use('/search', searchRouter)
 app.use(defaultErrorHandler)
 
 app.listen(port, () => {
