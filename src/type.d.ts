@@ -43,6 +43,10 @@ declare global {
       GOOGLE_AUTHORIZED_REDIRECT_URI: string
       PORT: number
       HOST: string
+      AWS_ACCESS_KEY_ID: string
+      AWS_SECRET_ACCESS_KEY: string
+      AWS_REGION: string
+      SES_FROM_ADDRESS: string
     }
   }
 }

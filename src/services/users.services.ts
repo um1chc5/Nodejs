@@ -12,6 +12,8 @@ import { ErrorWithStatus } from '~/models/errors.model'
 import { USER_MESSAGES } from '~/constants/messages'
 import HttpStatusCode from '~/constants/HttpStatusCode.enum'
 
+import { emailTemplate, generateEmailBodyFromTemplate, sendEmail } from '~/utils/email'
+
 config()
 
 class UsersServices {
@@ -141,6 +143,18 @@ class UsersServices {
       })
     )
 
+    // Send verify email+
+
+    await sendEmail({
+      toAddresses: [payload.email],
+      subject: 'Twitter Aner: Verify your email address',
+      htmlBody: generateEmailBodyFromTemplate({
+        title: 'Verify your email address',
+        content: `Your verify link : <strong>${email_verify_token}</strong>`,
+        titleLink: 'Verify your email'
+      })
+    })
+
     const [access_token, refresh_token] = await this.generateTokens(user_id.toString())
 
     await this.insertNewRefreshToken(user_id, refresh_token)
@@ -201,34 +215,48 @@ class UsersServices {
 
   async resendVerifyEmail(user_id: string) {
     const email_verify_token = await this.signEmailVerifyToken(user_id)
-    const result = await databaseService.users.updateOne(
+    const updatedUser = await databaseService.users.findOneAndUpdate(
       { _id: new ObjectId(user_id) },
       {
-        $set: {
-          email_verify_token: email_verify_token
-        },
-        $currentDate: {
-          updated_at: true
-        }
-      }
+        $set: { email_verify_token },
+        $currentDate: { updated_at: true }
+      },
+      { returnDocument: 'after' } // Ensures the updated document is returned
     )
 
-    return result
+    const emailBody = generateEmailBodyFromTemplate({
+      title: 'Verify your email address',
+      content: `Your verify link : <strong>${email_verify_token}</strong>`,
+      titleLink: 'Verify your email'
+    })
+    await sendEmail({
+      toAddresses: [updatedUser.email],
+      subject: 'Twitter Aner: Verify your email address',
+      htmlBody: emailBody
+    })
+    return updatedUser
   }
 
   async createForgotPasswordToken(user_id: string) {
     const token = await this.signForgotPasswordToken(user_id)
-    await databaseService.users.updateOne(
+    const updatedUser = await databaseService.users.findOneAndUpdate(
       { _id: new ObjectId(user_id) },
       {
-        $set: {
-          forgot_password_token: token
-        },
-        $currentDate: {
-          updated_at: true
-        }
-      }
+        $set: { forgot_password_token: token },
+        $currentDate: { updated_at: true }
+      },
+      { returnDocument: 'after' } // Ensures the updated document is returned
     )
+
+    sendEmail({
+      toAddresses: [updatedUser.email],
+      subject: 'Twitter Aner: Your Password Reset Link',
+      htmlBody: generateEmailBodyFromTemplate({
+        title: 'Your Password Reset Link',
+        content: `Your verify link : <strong>${token}</strong>`,
+        titleLink: 'Change your password'
+      })
+    })
 
     return token
   }
