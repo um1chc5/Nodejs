@@ -6,9 +6,11 @@ import { isProduction } from '~/constants/config'
 import { Media } from '~/models/others.mode'
 import { EncodingStatus, MediaType } from '~/constants/enum'
 import { encodeHLSWithMultipleVideoStreams } from '~/utils/hls'
-import { promises as fsPromise } from 'fs'
+import { promises as fsPromise, unlinkSync } from 'fs'
 import databaseService from './database.services'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
+import path from 'path'
+import { uploadFileToS3 } from '~/utils/s3'
 
 // Mongodb video status services
 
@@ -17,16 +19,31 @@ class MediaServices {
     const files = await handleUploadImage(req)
     const result = await Promise.all<Media>(
       files.map(async (file) => {
-        const newFilename = file.newFilename.split('.')[0]
-        await sharp(file.filepath)
-          .jpeg()
-          .toFile(UPLOAD_IMAGE_DIR + '/' + newFilename + '.jpg')
-        // fs.unlinkSync(file.filepath)
-        return {
-          url: isProduction
-            ? `${process.env.HOST}/static/${newFilename}.jpg`
-            : `http://localhost:${process.env.PORT}/static/images/${newFilename}.jpg`,
-          type: MediaType.Image
+        const newName = getNameFromFullName(file.newFilename.split('.')[0])
+        const outputPath = path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`)
+
+        try {
+          // Convert image using Sharp
+          sharp.cache(false)
+          const jpeg = sharp(file.filepath).jpeg()
+          await jpeg.toFile(outputPath)
+
+          const s3UploadResult = await uploadFileToS3({
+            name: file.newFilename,
+            filePath: outputPath,
+            mimeType: file.mimetype
+          })
+
+          // Safely delete the temporary file after processing
+          await Promise.all([fsPromise.unlink(file.filepath), fsPromise.unlink(outputPath)])
+
+          return {
+            url: s3UploadResult.Location,
+            type: MediaType.Image
+          }
+        } catch (error) {
+          console.error('Error processing image:', error)
+          throw error
         }
       })
     )
