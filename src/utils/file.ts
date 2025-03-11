@@ -60,8 +60,8 @@ export const handleUploadVideo = async (req: Request, type: 'hls' | 'static-stre
     uploadDir: folderPath,
     maxFiles: 4,
     keepExtensions: true,
-    maxFileSize: 30 * 1024 * 1024,
-    maxTotalFileSize: 4 * 30 * 1024 * 1024,
+    maxFileSize: 50 * 1024 * 1024,
+    maxTotalFileSize: 2 * 50 * 1024 * 1024,
     filter: function ({ name, mimetype }) {
       const valid = name === 'video' || mimetype?.includes('mp4') || mimetype?.includes('quicktime')
       if (!valid) {

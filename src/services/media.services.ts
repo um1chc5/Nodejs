@@ -1,6 +1,6 @@
 import { Request } from 'express'
 import sharp from 'sharp'
-import { UPLOAD_IMAGE_DIR } from '~/constants/dir'
+import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir'
 import { getNameFromFullName, handleUploadImage, handleUploadVideo } from '~/utils/file'
 import { isProduction } from '~/constants/config'
 import { Media } from '~/models/others.mode'
@@ -19,8 +19,7 @@ class MediaServices {
     const files = await handleUploadImage(req)
     const result = await Promise.all<Media>(
       files.map(async (file) => {
-        const newName = getNameFromFullName(file.newFilename.split('.')[0])
-        const outputPath = path.resolve(UPLOAD_IMAGE_DIR, `${newName}.jpg`)
+        const outputPath = path.resolve(UPLOAD_IMAGE_DIR, file.newFilename)
 
         try {
           // Convert image using Sharp
@@ -29,7 +28,7 @@ class MediaServices {
           await jpeg.toFile(outputPath)
 
           const s3UploadResult = await uploadFileToS3({
-            name: file.newFilename,
+            name: 'images/' + file.newFilename,
             filePath: outputPath,
             mimeType: file.mimetype
           })
@@ -54,11 +53,17 @@ class MediaServices {
     const files = await handleUploadVideo(req, 'static-stream')
     const result: Media[] = await Promise.all(
       files.map(async (file) => {
-        const { newFilename } = file
+        const { newFilename, mimetype } = file
+        const outputPath = path.resolve(UPLOAD_VIDEO_DIR, newFilename)
+
+        const s3UploadResult = await uploadFileToS3({
+          name: "videos/" + newFilename,
+          filePath: outputPath,
+          mimeType: mimetype
+        })
+
         return {
-          url: isProduction
-            ? `${process.env.HOST}/static/${newFilename}`
-            : `http://localhost:${process.env.PORT}/static/videos/${newFilename}`,
+          url: s3UploadResult.Location,
           type: MediaType.Video
         }
       })
