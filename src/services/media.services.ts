@@ -1,17 +1,18 @@
 import { Request } from 'express'
 import sharp from 'sharp'
 import { UPLOAD_IMAGE_DIR, UPLOAD_VIDEO_DIR } from '~/constants/dir'
-import { getNameFromFullName, handleUploadImage, handleUploadVideo } from '~/utils/file'
+import { getFilePaths, getNameFromFullName, handleUploadImage, handleUploadVideo } from '~/utils/file'
 import { isProduction } from '~/constants/config'
 import { Media } from '~/models/others.mode'
 import { EncodingStatus, MediaType } from '~/constants/enum'
 import { encodeHLSWithMultipleVideoStreams } from '~/utils/hls'
-import { promises as fsPromise, unlinkSync } from 'fs'
+import { promises as fsPromise, readdirSync, readFileSync, unlinkSync } from 'fs'
 import databaseService from './database.services'
 import VideoStatus from '~/models/schemas/VideoStatus.schema'
 import path from 'path'
 import { uploadFileToS3 } from '~/utils/s3'
-
+import getMime from '~/utils/mime'
+import { rimrafSync } from 'rimraf'
 // Mongodb video status services
 
 class MediaServices {
@@ -53,14 +54,15 @@ class MediaServices {
     const files = await handleUploadVideo(req, 'static-stream')
     const result: Media[] = await Promise.all(
       files.map(async (file) => {
-        const { newFilename, mimetype } = file
-        const outputPath = path.resolve(UPLOAD_VIDEO_DIR, newFilename)
+        const outputPath = path.resolve(UPLOAD_VIDEO_DIR, file.newFilename)
 
         const s3UploadResult = await uploadFileToS3({
-          name: "videos/" + newFilename,
+          name: 'videos/' + file.newFilename,
           filePath: outputPath,
-          mimeType: mimetype
+          mimeType: file.mimetype
         })
+
+        await fsPromise.unlink(outputPath)
 
         return {
           url: s3UploadResult.Location,
@@ -82,7 +84,7 @@ class MediaServices {
         return {
           url: isProduction
             ? `${process.env.HOST}/static/${newFilename}`
-            : `http://localhost:${process.env.PORT}/static/video-hls/${newFilename}/`,
+            : `http://localhost:${process.env.PORT}/static/video-hls/${newFilename}/master.m3u8`,
           type: MediaType.Video
         }
       })
@@ -166,12 +168,26 @@ class EncodingQueue {
     encodeHLSWithMultipleVideoStreams(filePath)
       .then(async () => {
         console.log('HLS encoding done:', filePath)
-
+        const mime = await getMime()
         // Update db status to success
         await videoStatusServices.updateStatus(idName, EncodingStatus.Success)
 
-        // Delete raw video file
-        await fsPromise.unlink(filePath)
+        const parentFoledrPath = path.join(filePath, '..')
+        const filePaths = getFilePaths(parentFoledrPath)
+
+        await Promise.all(
+          filePaths.map(async (_path) => {
+            const singleFilePath = _path.replace(parentFoledrPath, '')
+            return uploadFileToS3({
+              name: 'hls-video/' + idName + singleFilePath,
+              filePath: _path,
+              mimeType: mime.getType(_path)
+            })
+          })
+        )
+
+        // Delete video files
+        rimrafSync(path.resolve(UPLOAD_VIDEO_DIR, idName))
 
         // Encode next video in queue
         this.processEncoding()
