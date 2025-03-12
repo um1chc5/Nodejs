@@ -13,9 +13,20 @@ import likeRouter from './routes/like.routes'
 import './utils/fake'
 import searchRouter from './routes/search.routes'
 import './utils/s3'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+import kill from 'kill-port'
+import SocketModule from './utils/socket'
 
 const app = express()
 const port = process.env.PORT
+const httpServer = createServer(app)
+
+const IOInstance = new Server(httpServer, {
+  cors: {
+    origin: '*'
+  }
+})
 
 initFolder()
 
@@ -37,6 +48,10 @@ app.use('/likes', likeRouter)
 app.use('/search', searchRouter)
 app.use(defaultErrorHandler)
 
-app.listen(port, () => {
-  console.log('Listening to port', port)
+kill(port).then(() => {
+  httpServer.listen(port, () => {
+    console.log('Listening to port', port)
+  })
 })
+
+SocketModule.init(IOInstance)
