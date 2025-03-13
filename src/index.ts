@@ -14,19 +14,13 @@ import './utils/fake'
 import searchRouter from './routes/search.routes'
 import './utils/s3'
 import { createServer } from 'http'
-import { Server } from 'socket.io'
 import kill from 'kill-port'
 import SocketModule from './utils/socket'
+import conversationRouter from './routes/conversation.routes'
 
 const app = express()
 const port = process.env.PORT
 const httpServer = createServer(app)
-
-const IOInstance = new Server(httpServer, {
-  cors: {
-    origin: '*'
-  }
-})
 
 initFolder()
 
@@ -46,6 +40,7 @@ app.use('/tweets', tweetRouter)
 app.use('/bookmarks', bookMarkRouter)
 app.use('/likes', likeRouter)
 app.use('/search', searchRouter)
+app.use('/conversations', conversationRouter)
 app.use(defaultErrorHandler)
 
 kill(port).then(() => {
@@ -54,4 +49,4 @@ kill(port).then(() => {
   })
 })
 
-SocketModule.init(IOInstance)
+SocketModule.init(httpServer)

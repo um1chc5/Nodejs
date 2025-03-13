@@ -1,8 +1,10 @@
 import { config } from 'dotenv'
 import { Db, MongoClient } from 'mongodb'
 import { Bookmark } from '~/models/schemas/Bookmark.schema'
+import { Conversation } from '~/models/schemas/Conversation.schema'
 import { IFollower } from '~/models/schemas/Follower.schema'
 import Hashtag from '~/models/schemas/Hashtag.schema'
+import { Like } from '~/models/schemas/Like.schema'
 import { RefreshToken } from '~/models/schemas/Tokens.schema'
 import Tweet from '~/models/schemas/Tweet.schema'
 import { IUser } from '~/models/schemas/User.schema'
@@ -86,7 +88,11 @@ class DatabaseService {
   }
 
   get likes() {
-    return this.db.collection(process.env.DB_LIKES)
+    return this.db.collection<Like>(process.env.DB_LIKES)
+  }
+
+  get conversations() {
+    return this.db.collection<Conversation>(process.env.DB_CONVERSATIONS)
   }
 }
 

@@ -29,6 +29,7 @@ declare global {
       DB_HASHTAGS: string
       DB_BOOKMARK: string
       DB_LIKES: string
+      DB_CONVERSATIONS: string
       PASSWORD_SECRET: string
       JWT_SECRET_ACCESS_TOKEN: string
       JWT_SECRET_REFRESH_TOKEN: string
