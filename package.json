@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check .",
-    "prettier:fix": "prettier --write ."
+    "prettier:fix": "prettier --write .",
+    "swagger": "node ./src/swagger.ts"
   },
   "keywords": [],
   "author": "",
@@ -34,6 +35,7 @@
     "kill-port": "^2.0.1",
     "nodemon": "^3.1.0",
     "prettier": "^3.2.5",
+    "swagger-autogen": "^2.23.7",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
@@ -43,6 +45,7 @@
     "@aws-sdk/client-s3": "^3.758.0",
     "@aws-sdk/client-ses": "^3.758.0",
     "@aws-sdk/lib-storage": "^3.758.0",
+    "@types/swagger-ui-express": "^4.1.8",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
@@ -58,6 +61,7 @@
     "sharp": "^0.33.4",
     "slash": "^5.1.0",
     "socket.io": "^4.8.1",
+    "swagger-ui-express": "^5.0.1",
     "zx": "^8.1.4"
   }
 }

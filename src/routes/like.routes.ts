@@ -5,8 +5,22 @@ import { accessTokenValidator, verifiedUserValidator } from '~/middlewares/users
 
 const likeRouter = Router()
 
-likeRouter.post('/', accessTokenValidator, verifiedUserValidator, tweetIdValidator, addLikeController)
+likeRouter.post(
+  '/',
+  // #swagger.tags = ['Like']
+  accessTokenValidator,
+  verifiedUserValidator,
+  tweetIdValidator,
+  addLikeController
+)
 
-likeRouter.delete('/:tweet_id', accessTokenValidator, verifiedUserValidator, tweetIdValidator, unlikeController)
+likeRouter.delete(
+  '/:tweet_id',
+  // #swagger.tags = ['Like']
+  accessTokenValidator,
+  verifiedUserValidator,
+  tweetIdValidator,
+  unlikeController
+)
 
 export default likeRouter

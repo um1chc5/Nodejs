@@ -6,6 +6,13 @@ import { asyncWrapper } from '~/utils/asyncWrapper'
 
 const searchRouter = Router()
 
-searchRouter.get('/', accessTokenValidator, verifiedUserValidator, searchValidator, asyncWrapper(searchController))
+searchRouter.get(
+  '/',
+  // #swagger.tags = ['Search']
+  accessTokenValidator,
+  verifiedUserValidator,
+  searchValidator,
+  asyncWrapper(searchController)
+)
 
 export default searchRouter

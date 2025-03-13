@@ -12,10 +12,18 @@ import { audienceValidator, createTweetValidator, tweetIdValidator } from '~/mid
 
 const tweetRouter = Router()
 
-tweetRouter.post('/', accessTokenValidator, verifiedUserValidator, createTweetValidator, asyncWrapper(tweetController))
+tweetRouter.post(
+  '/',
+  // #swagger.tags = ['Tweet']
+  accessTokenValidator,
+  verifiedUserValidator,
+  createTweetValidator,
+  asyncWrapper(tweetController)
+)
 
 tweetRouter.get(
   '/:tweet_id',
+  // #swagger.tags = ['Tweet']
   isUserLoggedInValidator(accessTokenValidator),
   isUserLoggedInValidator(verifiedUserValidator),
   tweetIdValidator,
@@ -25,6 +33,7 @@ tweetRouter.get(
 
 tweetRouter.get(
   '/:tweet_id/children',
+  // #swagger.tags = ['Tweet']
   isUserLoggedInValidator(accessTokenValidator),
   isUserLoggedInValidator(verifiedUserValidator),
   tweetIdValidator,
@@ -34,6 +43,7 @@ tweetRouter.get(
 
 tweetRouter.get(
   '/',
+  // #swagger.tags = ['Tweet']
   accessTokenValidator,
   verifiedUserValidator,
   asyncWrapper(getNewFeedsController)

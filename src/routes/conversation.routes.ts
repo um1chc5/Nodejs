@@ -8,6 +8,7 @@ const conversationRouter = Router()
 
 conversationRouter.get(
   '/',
+   // #swagger.tags = ['Conversation']
   accessTokenValidator,
   verifiedUserValidator,
   conversationValidator,

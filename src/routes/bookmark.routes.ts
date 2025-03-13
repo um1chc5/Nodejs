@@ -8,6 +8,7 @@ const bookMarkRouter = Router()
 
 bookMarkRouter.post(
   '/',
+   // #swagger.tags = ['Bookmarks']
   accessTokenValidator,
   verifiedUserValidator,
   tweetIdValidator,
@@ -16,6 +17,7 @@ bookMarkRouter.post(
 
 bookMarkRouter.delete(
   '/:tweet_id',
+   // #swagger.tags = ['Bookmarks']
   accessTokenValidator,
   verifiedUserValidator,
   tweetIdValidator,

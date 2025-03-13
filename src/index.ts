@@ -17,6 +17,8 @@ import { createServer } from 'http'
 import kill from 'kill-port'
 import SocketModule from './utils/socket'
 import conversationRouter from './routes/conversation.routes'
+import swaggerUi from 'swagger-ui-express'
+import swaggerJson from '../src/swagger_output.json'
 
 const app = express()
 const port = process.env.PORT
@@ -32,6 +34,7 @@ databaseService.connect().then(() => {
 
 app.use(cors())
 app.use(express.json())
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJson))
 app.use('/users', userRouter)
 app.use('/media', mediaRouter)
 app.use('/static', staticRoute)

@@ -35,42 +35,97 @@ import { asyncWrapper } from '~/utils/asyncWrapper'
 
 const userRouter = Router()
 
-userRouter.post('/login', loginValidator, asyncWrapper(loginController))
+userRouter.post(
+  '/login',
+  // #swagger.tags = ['User']
+  loginValidator,
+  asyncWrapper(loginController)
+)
 
-userRouter.post('/register', registerValidator, asyncWrapper(registerController))
+userRouter.post(
+  '/register',
+  // #swagger.tags = ['User']
 
-userRouter.post('/refresh-tokens-pair', refreshTokenValidator, asyncWrapper(refreshTokensPairController))
+  registerValidator,
+  asyncWrapper(registerController)
+)
 
-userRouter.post('/logout', accessTokenValidator, refreshTokenValidator, asyncWrapper(logoutController))
+userRouter.post(
+  '/refresh-tokens-pair',
+  // #swagger.tags = ['User']
+  refreshTokenValidator,
+  asyncWrapper(refreshTokensPairController)
+)
 
-userRouter.post('/verify-email', verifyEmailTokenValidator, asyncWrapper(verifyEmailController))
+userRouter.post(
+  '/logout',
+  // #swagger.tags = ['User']
+  accessTokenValidator,
+  refreshTokenValidator,
+  asyncWrapper(logoutController)
+)
 
-userRouter.post('/resend-verify-email', accessTokenValidator, asyncWrapper(resendVerifyEmailController))
+userRouter.post(
+  '/verify-email',
+  // #swagger.tags = ['User']
+  verifyEmailTokenValidator,
+  asyncWrapper(verifyEmailController)
+)
 
-userRouter.post('/forgot-password', forgotPasswordValidator, asyncWrapper(forgotPasswordController))
+userRouter.post(
+  '/resend-verify-email',
+  // #swagger.tags = ['User']
+  accessTokenValidator,
+  asyncWrapper(resendVerifyEmailController)
+)
+
+userRouter.post(
+  '/forgot-password',
+  // #swagger.tags = ['User']
+  forgotPasswordValidator,
+  asyncWrapper(forgotPasswordController)
+)
 
 userRouter.post(
   '/verify-forgot-password',
+  // #swagger.tags = ['User']
   forgotPasswordTokenValidator,
   asyncWrapper(verifyForgotPasswordTokenController)
 )
 
-userRouter.post('/reset-password', resetPasswordValidator, asyncWrapper(resetPasswordController))
+userRouter.post(
+  '/reset-password',
+  // #swagger.tags = ['User']
+  resetPasswordValidator,
+  asyncWrapper(resetPasswordController)
+)
 
-userRouter.get('/me', accessTokenValidator, asyncWrapper(getMeController))
+userRouter.get(
+  '/me',
+  // #swagger.tags = ['User']
+  accessTokenValidator,
+  asyncWrapper(getMeController)
+)
 
 userRouter.patch(
   '/update-me',
+  // #swagger.tags = ['User']
   accessTokenValidator,
   asyncWrapper(verifiedUserValidator),
   updateProfileValidator,
   asyncWrapper(updateProfileController)
 )
 
-userRouter.get('/get-profile/:username', accessTokenValidator, asyncWrapper(getProfileController))
+userRouter.get(
+  '/get-profile/:username',
+  // #swagger.tags = ['User']
+  accessTokenValidator,
+  asyncWrapper(getProfileController)
+)
 
 userRouter.post(
   '/follow/add',
+  // #swagger.tags = ['User']
   accessTokenValidator,
   asyncWrapper(verifiedUserValidator),
   followValidator,
@@ -79,6 +134,7 @@ userRouter.post(
 
 userRouter.post(
   '/follow/remove',
+  // #swagger.tags = ['User']
   accessTokenValidator,
   asyncWrapper(verifiedUserValidator),
   followValidator,
@@ -87,11 +143,16 @@ userRouter.post(
 
 userRouter.post(
   '/change-password',
+  // #swagger.tags = ['User']
   accessTokenValidator,
   changePasswordValidator,
   asyncWrapper(changePasswordController)
 )
 
-userRouter.get('/oauth/google', asyncWrapper(googleOAuthController))
+userRouter.get(
+  '/oauth/google',
+  // #swagger.tags = ['User']
+  asyncWrapper(googleOAuthController)
+)
 
 export default userRouter
