@@ -47,7 +47,7 @@ app.use('/conversations', conversationRouter)
 app.use(defaultErrorHandler)
 
 kill(port).then(() => {
-  httpServer.listen(port, () => {
+  httpServer.listen(port, '0.0.0.0', () => {
     console.log('Listening to port', port)
   })
 })
