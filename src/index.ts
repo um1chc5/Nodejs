@@ -46,10 +46,8 @@ app.use('/search', searchRouter)
 app.use('/conversations', conversationRouter)
 app.use(defaultErrorHandler)
 
-kill(port).then(() => {
-  httpServer.listen(port, '0.0.0.0', () => {
-    console.log('Listening to port', port)
-  })
+httpServer.listen(port, '0.0.0.0', () => {
+  console.log('Listening to port', port)
 })
 
 SocketModule.init(httpServer)
