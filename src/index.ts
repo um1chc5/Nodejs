@@ -34,7 +34,7 @@ databaseService.connect().then(() => {
 
 app.use(cors())
 app.use(express.json())
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJson))
+app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerJson))
 app.use('/users', userRouter)
 app.use('/media', mediaRouter)
 app.use('/static', staticRoute)
