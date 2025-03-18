@@ -28,6 +28,7 @@ jobs:
           port: 22
           script: |
             cd Nodejs
-            git pull origin main -f
+            git fetch origin main
+            git reset --hard origin/main  # Force update with remote branch
             cp ../.env .  # Copy .env from the parent directory to the Nodejs folder
             docker compose up -d --build
