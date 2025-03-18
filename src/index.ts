@@ -34,7 +34,8 @@ databaseService.connect().then(() => {
 
 app.use(cors())
 app.use(express.json())
-app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerJson))
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJson))
 app.use('/users', userRouter)
 app.use('/media', mediaRouter)
 app.use('/static', staticRoute)
@@ -44,6 +45,7 @@ app.use('/bookmarks', bookMarkRouter)
 app.use('/likes', likeRouter)
 app.use('/search', searchRouter)
 app.use('/conversations', conversationRouter)
+
 app.use(defaultErrorHandler)
 
 httpServer.listen(port, '0.0.0.0', () => {
