@@ -17,6 +17,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Check Docker Compose version
+        run: docker compose version
+
+      - name: Build and run the container
+        run: docker compose up -d --build
+
       # Set up environment variables from GitHub Secrets
       - name: Create .env file
         run: |
@@ -53,9 +62,13 @@ jobs:
           SES_FROM_ADDRESS=${{ secrets.SES_FROM_ADDRESS }}
           EOF
 
+      # Stop and remove existing containers (if any)
+      - name: Stop existing containers
+        run: docker compose down || true
+
       # Build and Run Docker Compose
       - name: Build and Run Docker Compose
-        run: docker-compose up -d --build
+        run: docker compose up -d --build
 
       # Monitor running containers
       - name: Docker PS
