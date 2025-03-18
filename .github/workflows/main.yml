@@ -13,20 +13,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Check Docker Compose version
-        run: docker compose version
+      # Enable Docker layer caching using GitHub Actions cache
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
-      - name: Build and run the container
-        run: docker compose up -d --build
-
-      # Set up environment variables from GitHub Secrets
+      # Create .env file first
       - name: Create .env file
         run: |
           cat <<EOF > .env
@@ -62,24 +64,36 @@ jobs:
           SES_FROM_ADDRESS=${{ secrets.SES_FROM_ADDRESS }}
           EOF
 
-      # Stop and remove existing containers (if any)
-      - name: Stop existing containers
-        run: docker compose down || true
+      # Export Docker Buildx caching options as environment variables
+      - name: Setup Buildx cache options
+        run: |
+          echo "DOCKER_BUILDKIT=1" >> $GITHUB_ENV
+          echo "COMPOSE_DOCKER_CLI_BUILD=1" >> $GITHUB_ENV
+          echo "BUILDX_CACHE_FROM=type=local,src=/tmp/.buildx-cache" >> $GITHUB_ENV
+          echo "BUILDX_CACHE_TO=type=local,dest=/tmp/.buildx-cache-new,mode=max" >> $GITHUB_ENV
 
-      # Build and Run Docker Compose
-      - name: Build and Run Docker Compose
-        run: docker compose up -d --build
+      # Build and run Docker Compose with BuildKit enabled
+      - name: Build and Start Docker Compose
+        run: |
+          # Build with buildkit for caching
+          docker buildx create --use
+          docker compose build
+          docker compose up -d
 
       # Monitor running containers
       - name: Docker PS
         run: docker ps
-
-      # Clean up Docker resources
-      - name: Cleanup Docker
-        run: docker system prune -af
 
       # Test if the application is running using curl
       - name: Test localhost with curl
         run: |
           sleep 5  # Wait a bit for the container to start
           curl -v http://localhost:4000/
+
+      # Update cache for future runs
+      - name: Update cache
+        run: |
+          if [ -d /tmp/.buildx-cache-new ]; then
+            rm -rf /tmp/.buildx-cache
+            mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          fi
