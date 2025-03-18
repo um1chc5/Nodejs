@@ -28,8 +28,6 @@ jobs:
           port: 22
           script: |
             cd Nodejs
-            git pull origin main
+            git pull origin main -f
             cp ../.env .  # Copy .env from the parent directory to the Nodejs folder
-            docker compose down
-            docker compose build
-            docker compose up -d
+            docker compose up -d --build
