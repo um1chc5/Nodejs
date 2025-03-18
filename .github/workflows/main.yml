@@ -1,100 +1,35 @@
-name: Build and Run Docker Compose
+name: Build and Deploy
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  build-and-run:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - name: Packages Installation
+        run: npm install # or any other build command
 
-      # Test Cache
-      # Enable Docker layer caching using GitHub Actions cache
-      - name: Cache Docker layers
-        uses: actions/cache@v3
+      - name: Run Build Checks
+        run: npm run build # or any other build command
+
+      - name: SSH into GC VM and Deploy
+        uses: appleboy/ssh-action@master
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      # Create .env file first
-      - name: Create .env file
-        run: |
-          cat <<EOF > .env
-          DB_USERNAME=${{ secrets.DB_USERNAME }}
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          DB_NAME=${{ secrets.DB_NAME }}
-          DB_USER=${{ secrets.DB_USER }}
-          DB_REFRESH_TOKEN=${{ secrets.DB_REFRESH_TOKEN }}
-          DB_FOLLOWERS=${{ secrets.DB_FOLLOWERS }}
-          DB_VIDEO_STATUS_COLLECTION=${{ secrets.DB_VIDEO_STATUS_COLLECTION }}
-          DB_TWEETS=${{ secrets.DB_TWEETS }}
-          DB_HASHTAGS=${{ secrets.DB_HASHTAGS }}
-          DB_BOOKMARK=${{ secrets.DB_BOOKMARK }}
-          DB_LIKES=${{ secrets.DB_LIKES }}
-          DB_CONVERSATIONS=${{ secrets.DB_CONVERSATIONS }}
-          PASSWORD_SECRET=${{ secrets.PASSWORD_SECRET }}
-          JWT_SECRET_ACCESS_TOKEN=${{ secrets.JWT_SECRET_ACCESS_TOKEN }}
-          JWT_SECRET_REFRESH_TOKEN=${{ secrets.JWT_SECRET_REFRESH_TOKEN }}
-          JWT_EMAIL_VERIFY_TOKEN=${{ secrets.JWT_EMAIL_VERIFY_TOKEN }}
-          JWT_FORGOT_PASSWORD_TOKEN=${{ secrets.JWT_FORGOT_PASSWORD_TOKEN }}
-          ACCESS_TOKEN_EXPIRE=${{ secrets.ACCESS_TOKEN_EXPIRE }}
-          REFRESH_TOKEN_EXPIRE=${{ secrets.REFRESH_TOKEN_EXPIRE }}
-          EMAIL_VERIFY_TOKEN_EXPIRE=${{ secrets.EMAIL_VERIFY_TOKEN_EXPIRE }}
-          FORGOT_PASSWORD_TOKEN_EXPIRE=${{ secrets.FORGOT_PASSWORD_TOKEN_EXPIRE }}
-          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GOOGLE_AUTHORIZED_REDIRECT_URI=${{ secrets.GOOGLE_AUTHORIZED_REDIRECT_URI }}
-          PORT=${{ secrets.PORT }}
-          HOST=${{ secrets.HOST }}
-          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION=${{ secrets.AWS_REGION }}
-          SES_FROM_ADDRESS=${{ secrets.SES_FROM_ADDRESS }}
-          EOF
-
-      # Export Docker Buildx caching options as environment variables
-      - name: Setup Buildx cache options
-        run: |
-          echo "DOCKER_BUILDKIT=1" >> $GITHUB_ENV
-          echo "COMPOSE_DOCKER_CLI_BUILD=1" >> $GITHUB_ENV
-          echo "BUILDX_CACHE_FROM=type=local,src=/tmp/.buildx-cache" >> $GITHUB_ENV
-          echo "BUILDX_CACHE_TO=type=local,dest=/tmp/.buildx-cache-new,mode=max" >> $GITHUB_ENV
-
-      # Build and run Docker Compose with BuildKit enabled
-      - name: Build and Start Docker Compose
-        run: |
-          # Build with buildkit for caching
-          docker buildx create --use
-          docker compose build
-          docker compose up -d
-
-      # Monitor running containers
-      - name: Docker PS
-        run: docker ps
-
-      # Test if the application is running using curl
-      - name: Test localhost with curl
-        run: |
-          sleep 5  # Wait a bit for the container to start
-          curl -v http://localhost:4000/
-
-      # Update cache for future runs
-      - name: Update cache
-        run: |
-          if [ -d /tmp/.buildx-cache-new ]; then
-            rm -rf /tmp/.buildx-cache
-            mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-          fi
+          host: ${{ secrets.GC_VM_HOST }}
+          username: ${{ secrets.GC_VM_USER }}
+          key: ${{ secrets.GC_VM_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd Nodejs
+            git pull origin main
+            cp ../.env .  # Copy .env from the parent directory to the Nodejs folder
+            docker compose down
+            docker compose build
+            docker compose up -d
