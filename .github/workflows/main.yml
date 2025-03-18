@@ -77,3 +77,9 @@ jobs:
       # Clean up Docker resources
       - name: Cleanup Docker
         run: docker system prune -af
+
+      # Test if the application is running using curl
+      - name: Test localhost with curl
+        run: |
+          sleep 5  # Wait a bit for the container to start
+          curl -v http://localhost:4000/
