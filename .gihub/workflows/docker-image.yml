@@ -1,0 +1,66 @@
+name: Build and Run Docker Compose
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up environment variables from GitHub Secrets
+      - name: Create .env file
+        run: |
+          cat <<EOF > .env
+          DB_USERNAME=${{ secrets.DB_USERNAME }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_NAME=${{ secrets.DB_NAME }}
+          DB_USER=${{ secrets.DB_USER }}
+          DB_REFRESH_TOKEN=${{ secrets.DB_REFRESH_TOKEN }}
+          DB_FOLLOWERS=${{ secrets.DB_FOLLOWERS }}
+          DB_VIDEO_STATUS_COLLECTION=${{ secrets.DB_VIDEO_STATUS_COLLECTION }}
+          DB_TWEETS=${{ secrets.DB_TWEETS }}
+          DB_HASHTAGS=${{ secrets.DB_HASHTAGS }}
+          DB_BOOKMARK=${{ secrets.DB_BOOKMARK }}
+          DB_LIKES=${{ secrets.DB_LIKES }}
+          DB_CONVERSATIONS=${{ secrets.DB_CONVERSATIONS }}
+          PASSWORD_SECRET=${{ secrets.PASSWORD_SECRET }}
+          JWT_SECRET_ACCESS_TOKEN=${{ secrets.JWT_SECRET_ACCESS_TOKEN }}
+          JWT_SECRET_REFRESH_TOKEN=${{ secrets.JWT_SECRET_REFRESH_TOKEN }}
+          JWT_EMAIL_VERIFY_TOKEN=${{ secrets.JWT_EMAIL_VERIFY_TOKEN }}
+          JWT_FORGOT_PASSWORD_TOKEN=${{ secrets.JWT_FORGOT_PASSWORD_TOKEN }}
+          ACCESS_TOKEN_EXPIRE=${{ secrets.ACCESS_TOKEN_EXPIRE }}
+          REFRESH_TOKEN_EXPIRE=${{ secrets.REFRESH_TOKEN_EXPIRE }}
+          EMAIL_VERIFY_TOKEN_EXPIRE=${{ secrets.EMAIL_VERIFY_TOKEN_EXPIRE }}
+          FORGOT_PASSWORD_TOKEN_EXPIRE=${{ secrets.FORGOT_PASSWORD_TOKEN_EXPIRE }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_AUTHORIZED_REDIRECT_URI=${{ secrets.GOOGLE_AUTHORIZED_REDIRECT_URI }}
+          PORT=${{ secrets.PORT }}
+          HOST=${{ secrets.HOST }}
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION=${{ secrets.AWS_REGION }}
+          SES_FROM_ADDRESS=${{ secrets.SES_FROM_ADDRESS }}
+          EOF
+
+      # Build and Run Docker Compose
+      - name: Build and Run Docker Compose
+        run: docker-compose up -d --build
+
+      # Monitor running containers
+      - name: Docker PS
+        run: docker ps
+
+      # Clean up Docker resources
+      - name: Cleanup Docker
+        run: docker system prune -af
